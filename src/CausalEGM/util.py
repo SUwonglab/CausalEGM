@@ -28,7 +28,9 @@ class Data_sampler_linear(object):
         self.beta = np.ones((z1_dim,1)) 
         self.ax = 2
         self.data_y = np.random.normal(self.ax*self.data_x + np.dot(self.data_v[:,:z1_dim], self.beta) , 0.1)
-
+        self.data_x = self.data_x.astype('float32')
+        self.data_y = self.data_y.astype('float32')
+        self.data_v = self.data_v.astype('float32')
         print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
 
     def train(self, batch_size):
@@ -40,7 +42,7 @@ class Data_sampler_linear(object):
 
 
 class Data_sampler_non_linear(object):
-    def __init__(self, N = 20000, v_dim=10, z1_dim=3, ax = 1, bx = 1):
+    def __init__(self, N = 20000, v_dim=10, z1_dim=1, ax = 1, bx = 1):
         np.random.seed(123)
         self.sample_size = N
         self.v_dim = v_dim
@@ -54,6 +56,9 @@ class Data_sampler_non_linear(object):
         self.data_x = self.get_value_x(self.data_v)
         #self.data_y = np.random.normal(self.bx*self.data_x + self.ax*self.data_x**2 * np.dot(self.data_v[:,:z1_dim], self.beta) , 0.1)
         self.data_y = self.get_value_y(self.data_v, self.data_x)
+        self.data_x = self.data_x.astype('float32')
+        self.data_y = self.data_y.astype('float32')
+        self.data_v = self.data_v.astype('float32')
         print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
 
     def train(self, batch_size):
@@ -71,6 +76,25 @@ class Data_sampler_non_linear(object):
     def load_all(self):
         return self.data_x, self.data_y, self.data_v
 
+class Gaussian_sampler(object):
+    def __init__(self, N, mean, sd=1):
+        self.total_size = N
+        self.mean = mean
+        self.sd = sd
+        np.random.seed(1024)
+        self.X = np.random.normal(self.mean, self.sd, (self.total_size,len(self.mean)))
+        self.X = self.X.astype('float32')
+        self.Y = None
+
+    def train(self, batch_size, label = False):
+        indx = np.random.randint(low = 0, high = self.total_size, size = batch_size)
+        return self.X[indx, :]
+
+    def get_batch(self,batch_size):
+        return np.random.normal(self.mean, self.sd, (batch_size,len(self.mean)))
+
+    def load_all(self):
+        return self.X, self.Y
 
 #sample continuous (Gaussian) and discrete (Catagory) latent variables together
 class Mixture_sampler(object):
@@ -154,3 +178,25 @@ def softmax(x):
     x -= np.max(x, axis = 1, keepdims = True)
     x = np.exp(x) / np.sum(np.exp(x), axis = 1, keepdims = True)
     return x
+
+#get a batch of data from previous 50 batches, add stochastic
+class DataPool(object):
+    def __init__(self, maxsize=50):
+        self.maxsize = maxsize
+        self.nb_batch = 0
+        self.pool = []
+
+    def __call__(self, data):
+        if self.nb_batch < self.maxsize:
+            self.pool.append(data)
+            self.nb_batch += 1
+            return data
+        if np.random.rand() > 0.5:
+            results=[]
+            for i in range(len(data)):
+                idx = int(np.random.rand()*self.maxsize)
+                results.append(copy.copy(self.pool[idx])[i])
+                self.pool[idx][i] = data[i]
+            return results
+        else:
+            return data
