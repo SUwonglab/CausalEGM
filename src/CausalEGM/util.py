@@ -51,7 +51,7 @@ class Data_sampler_non_linear(object):
         self.bx = bx
         self.alpha = np.ones((z1_dim,1))
         self.beta = np.ones((z1_dim,1)) 
-        self.data_v = np.random.normal(0, 0.1, size=(N, v_dim))
+        self.data_v = np.random.normal(0, 1, size=(N, v_dim))
         #self.data_x = np.dot(self.data_v[:,:z1_dim],self.alpha)#(N,1)
         self.data_x = self.get_value_x(self.data_v)
         #self.data_y = np.random.normal(self.bx*self.data_x + self.ax*self.data_x**2 * np.dot(self.data_v[:,:z1_dim], self.beta) , 0.1)
@@ -60,6 +60,7 @@ class Data_sampler_non_linear(object):
         self.data_y = self.data_y.astype('float32')
         self.data_v = self.data_v.astype('float32')
         print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
+        print(np.max(self.data_x),np.max(self.data_y), np.max(self.data_v))
 
     def train(self, batch_size):
         indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
