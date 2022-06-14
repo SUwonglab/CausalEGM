@@ -1,7 +1,7 @@
 import tensorflow as tf
 from . model import BaseFullyConnectedNet, Discriminator
 import numpy as np
-from . util import Gaussian_sampler, Data_sampler_non_linear
+from . util import Gaussian_sampler, Data_sampler_non_linear, Data_sampler_linear
 import dateutil.tz
 import datetime
 import sys
@@ -16,18 +16,18 @@ class CausalEGM(object):
         super(CausalEGM, self).__init__()
         self.params = params
         self.g_net = BaseFullyConnectedNet(input_dim=params['z_dim'],output_dim = params['v_dim'], 
-                                        model_name='g_net', nb_units=[5,6,8])
+                                        model_name='g_net', nb_units=[64]*5)
         self.e_net = BaseFullyConnectedNet(input_dim=params['v_dim'],output_dim = params['z_dim'], 
-                                        model_name='e_net', nb_units=[8,6,5])
+                                        model_name='e_net', nb_units=[64]*5)
         self.dz_net = Discriminator(input_dim=params['z_dim'],model_name='dz_net',
-                                        nb_units=[3, 2])
+                                        nb_units=[32]*3)
         self.dv_net = Discriminator(input_dim=params['v_dim'],model_name='dv_net',
-                                        nb_units=[8, 3])
+                                        nb_units=[32]*3)
 
         self.f_net = BaseFullyConnectedNet(input_dim=1+params['z0_dim']+params['z2_dim'],
-                                        output_dim = 1, model_name='f_net', nb_units=[3,3])
+                                        output_dim = 1, model_name='f_net', nb_units=[64]*5)
         self.h_net = BaseFullyConnectedNet(input_dim=params['z0_dim']+params['z1_dim'],
-                                        output_dim = 1, model_name='h_net', nb_units=[2,2])
+                                        output_dim = 1, model_name='h_net', nb_units=[64]*5)
 
         self.g_e_optimizer = tf.keras.optimizers.Adam(params['lr'], beta_1=0.5, beta_2=0.9)
         self.d_optimizer = tf.keras.optimizers.Adam(params['lr'], beta_1=0.5, beta_2=0.9)
@@ -35,6 +35,7 @@ class CausalEGM(object):
 
         #joint sampling v, x, y
         self.data_sampler = Data_sampler_non_linear(N=20000, v_dim=params['v_dim'])
+        #self.data_sampler = Data_sampler_linear(N=20000, v_dim=params['v_dim'])
 
         self.initilize_nets()
         now = datetime.datetime.now(dateutil.tz.tzlocal())
@@ -122,7 +123,8 @@ class CausalEGM(object):
             g_e_loss = g_loss_adv+e_loss_adv+self.params['alpha']*(l2_loss_v + l2_loss_z) \
                         + self.params['beta']*(l2_loss_x+l2_loss_y)
         # Calculate the gradients for generators and discriminators
-        g_e_gradients = gen_tape.gradient(g_e_loss, self.g_net.trainable_variables+self.e_net.trainable_variables)
+        g_e_gradients = gen_tape.gradient(g_e_loss, self.g_net.trainable_variables+self.e_net.trainable_variables+\
+                                        self.f_net.trainable_variables+self.h_net.trainable_variables)
         
         # Apply the gradients to the optimizer
         self.g_e_optimizer.apply_gradients(zip(g_e_gradients, self.g_net.trainable_variables+self.e_net.trainable_variables+\
@@ -204,7 +206,7 @@ class CausalEGM(object):
                 ckpt_save_path = self.ckpt_manager.save()
                 print ('Saving checkpoint for epoch {} at {}'.format(batch_idx,ckpt_save_path))
 
-    def evaluate(self, batch_idx, num_per_dim=3000, x_min=-10, x_max=10, nb_intervals=200):
+    def evaluate(self, batch_idx, num_per_dim=3000, x_min=-5, x_max=5, nb_intervals=200):
         data_x, data_y, data_v = self.data_sampler.load_all()
         data_z = self.z_sampler.train(len(data_x))
         data_v_ = self.g_net(data_z)
@@ -213,7 +215,7 @@ class CausalEGM(object):
         data_z1 = data_z_[:,self.params['z0_dim']:(self.params['z0_dim']+self.params['z1_dim'])]
         data_z2 = data_z_[:,(self.params['z0_dim']+self.params['z1_dim']):(self.params['z0_dim']+self.params['z1_dim']+self.params['z2_dim'])]
         data_z3 = data_z_[:-self.params['z3_dim']:]
-        np.savez('{}/data_at_{}.npz'.format(self.save_dir, batch_idx+1),data_v_,data_z_)
+        np.savez('{}/data_at_{}.npz'.format(self.save_dir, batch_idx),data_v_,data_z_)
         #average causal effect
         average_causal_effect = []
         for x in np.linspace(x_min, x_max, nb_intervals):
