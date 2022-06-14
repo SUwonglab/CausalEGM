@@ -22,16 +22,17 @@ class Data_sampler_linear(object):
         self.v_dim = v_dim
         self.z1_dim = z1_dim
         self.data_v = np.random.normal(0,1,size=(N, v_dim))
-        self.alpha = np.ones((z1_dim,1)) 
-        self.data_x = np.dot(self.data_v[:,:z1_dim],self.alpha)#(N,1)
+        self.alpha = np.ones((z1_dim,1))
+        self.data_x = np.random.normal(np.dot(self.data_v[:,:z1_dim],self.alpha), 0.1) #(N,1)
 
         self.beta = np.ones((z1_dim,1)) 
         self.ax = 2
-        self.data_y = np.random.normal(self.ax*self.data_x + np.dot(self.data_v[:,:z1_dim], self.beta) , 0.1)
+        self.data_y = np.random.normal(self.ax*self.data_x + np.dot(self.data_v[:,2:(z1_dim+2)], self.beta) , 0.1)
         self.data_x = self.data_x.astype('float32')
         self.data_y = self.data_y.astype('float32')
         self.data_v = self.data_v.astype('float32')
         print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
+        print(np.max(self.data_x),np.max(self.data_y), np.max(self.data_v))
 
     def train(self, batch_size):
         indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
@@ -42,15 +43,15 @@ class Data_sampler_linear(object):
 
 
 class Data_sampler_non_linear(object):
-    def __init__(self, N = 20000, v_dim=10, z1_dim=1, ax = 1, bx = 1):
+    def __init__(self, N = 20000, v_dim=10, z1_dim=3, ax = 1, bx = 1):
         np.random.seed(123)
         self.sample_size = N
         self.v_dim = v_dim
         self.z1_dim = z1_dim
         self.ax = ax
         self.bx = bx
-        self.alpha = np.ones((z1_dim,1))
-        self.beta = np.ones((z1_dim,1)) 
+        self.alpha = np.ones((z1_dim,1))/z1_dim
+        self.beta = np.ones((z1_dim,1))/z1_dim
         self.data_v = np.random.normal(0, 1, size=(N, v_dim))
         #self.data_x = np.dot(self.data_v[:,:z1_dim],self.alpha)#(N,1)
         self.data_x = self.get_value_x(self.data_v)
@@ -68,11 +69,11 @@ class Data_sampler_non_linear(object):
     
     #get x given v(or z1)
     def get_value_x(self, v):
-        return np.dot(v[:,:self.z1_dim],self.alpha)
+        return np.random.normal(np.dot(v[:,:self.z1_dim],self.alpha), 0.1)
 
     #get y given x and v(or z1)
     def get_value_y(self, v, x):
-        return np.random.normal(self.bx * x + self.ax* x**2 * np.dot(v[:,:self.z1_dim], self.beta) , 0.1)
+        return np.random.normal(self.bx * x + self.ax* x**2 * np.dot(v[:,4:(4+self.z1_dim)], self.beta) , 0.1)
 
     def load_all(self):
         return self.data_x, self.data_y, self.data_v
