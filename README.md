@@ -1,5 +1,5 @@
 # CausalEGM
-Deep Encoding Generative Modeling for Causal Inference
+Estimating Causal Effect by Deep Encoding Generative Modeling
 
 1) migrate code from TensorFlow v1 to TensorFlow v2
 2) implement the idea we discussed with a simple simulation dataset
