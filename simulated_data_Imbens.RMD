@@ -1,0 +1,129 @@
+---
+title: "data_generat"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+
+```{r}
+library(causaldrf)
+```
+
+```{r}
+set.seed(0)
+Imbens_Sim_Sample <- function(N, V_dim){
+  V <- matrix(rexp(N*V_dim), N, V_dim) 
+  Z0 <- V[,1]
+  Z1 <- V[,2]
+  Z2 <- V[,3]
+  Z3 <- V[,4]
+  X <- rexp(N, Z0+Z1)
+  gps <- (Z0+Z1) * exp(-(Z0+Z1)*X)
+  Y <- rnorm(N, mean=X+(Z0+Z2)*exp(-X*(Z0+Z2)), sd=1)
+  Imbens_sim_data <- data.frame(cbind(V, X, Y, gps))
+  return(Imbens_sim_data)
+}
+
+Imbens_sim_data <- Imbens_Sim_Sample(20000, 12)
+
+```
+
+```{r}
+dim(Imbens_sim_data)
+write.csv(Imbens_sim_data,"Imbens_simulated_data_N20000.csv", row.names = FALSE)
+```
+
+
+```{r}
+# t = quantile(hi_sim_data$T,
+#     probs = seq(0, .95, by = 0.01))
+
+# t = seq(0.0001, 10, by = 0.1)
+t <- seq(0.01, 3.0, length.out = 300)
+true_effect = t + 2/((1 + t)**3)
+
+t
+```
+
+#### Export Data to CSV
+```{r}
+
+write.csv(hi_sim_data,"Imbens_simulated_data_N20000.csv", row.names = FALSE)
+
+```
+
+```{r}
+eval_data <- as.data.frame(cbind(t, true_effect))
+write.csv(eval_data,"Imbens_simulated_eval_data.csv", row.names = FALSE)
+```
+
+
+
+
+
+```{r}
+add_spl_estimate <- add_spl_est(Y = Y,
+    treat = T,
+    treat_formula = T ~ X1 + X2,
+    data = hi_sim_data,
+    grid_val = t,
+    knot_num = 3,
+    treat_mod = "Gamma",
+    link_function = "inverse")
+
+mean((add_spl_estimate$param - true_effect)**2)
+
+
+```
+
+
+```{r}
+gam_estimate <- gam_est(Y = Y,
+treat = T,
+treat_formula = T ~ X1 + X2 ,
+data = hi_sim_data,
+grid_val = t,
+treat_mod = "Gamma",
+link_function = "inverse")
+
+
+mean((gam_estimate$param - true_effect)**2)
+```
+```{r}
+hi_estimate <- hi_est(Y = Y,
+treat = T,
+treat_formula = T ~ X1 + X2 ,
+outcome_formula = Y ~ T + I(T^2) +
+gps + I(gps^2) + T * gps,
+data = hi_sim_data,
+grid_val = t,
+treat_mod = "Gamma",
+link_function = "inverse")
+
+mean((hi_estimate$param - true_effect)**2)
+
+```
+
+
+```{r}
+iptw_estimate <- iptw_est(Y = Y,
+treat = T,
+treat_formula = T ~ X1 + X2,
+numerator_formula = T ~ 1,
+data = hi_sim_data,
+degree = 2,
+treat_mod = "Gamma",
+link_function = "inverse")
+
+mse_causal_effect = mean(((iptw_estimate$param[1] + iptw_estimate$param[2] * t + iptw_estimate$param[3] * t**2) - true_effect)**2)
+mse_causal_effect
+```
+
+
+
