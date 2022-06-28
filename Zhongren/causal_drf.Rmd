@@ -1,0 +1,241 @@
+---
+title: "causaldrf"
+output: html_document
+---
+
+
+
+```{r}
+library(causaldrf)
+source("simulate_data.R")
+```
+
+
+
+
+```{r}
+Imbens_sim_data <- Imbens_Sim(N=20000, V_dim=200, seed=1)
+
+```
+
+
+
+```{r}
+#### Imbens prop_spline_est 
+
+grid_eval <- seq(0.0, 3.0, length.out = 200)
+true_effect = grid_eval + 2/((1 + grid_eval)**3)
+true_MTFE<- rep(1,200) -6*(1+grid_eval)**(-4)
+
+
+Rmse_causal_effect_list <- numeric(0)
+MAPE_list <- numeric(0)
+bias_MTFE_list <- numeric(0)
+
+for (seed in 1:10){
+  Imbens_sim_data <- Imbens_Sim(N=20000, V_dim=200, seed=seed)
+  spline_estimate <- prop_spline_est(Y = Y,
+  treat = X,
+  covar_formula = ~ .-Y-X,
+                        covar_lin_formula = ~ .-Y-X,
+                        covar_sq_formula = ~ .-Y-X,
+      data = Imbens_sim_data,
+      degree=2,
+      
+      spline_const = 4,
+      spline_linear = 4,
+      spline_quad = 4,
+      method = "different"
+      )
+  
+  eps <- 0.0001
+  
+  predict_effect <- spline_estimate$param[1] + spline_estimate$param[2] * grid_eval + spline_estimate$param[3] * (grid_eval**2)
+  grid_eval_delta <- grid_eval-eps
+  predict_effect_delta<- spline_estimate$param[1] + spline_estimate$param[2] * grid_eval_delta + spline_estimate$param[3] * (grid_eval_delta**2)
+  
+  MTFE <- (predict_effect-predict_effect_delta)/eps
+  
+  Rmse_causal_effect = sqrt(mean((predict_effect - true_effect)**2))
+  MAPE <- mean(abs((predict_effect-true_effect)/true_effect))
+  bias_MTFE <-mean(abs(MTFE - true_MTFE))
+  
+  Rmse_causal_effect_list<- append(Rmse_causal_effect_list, Rmse_causal_effect)
+  MAPE_list <- append(MAPE_list, MAPE)
+  bias_MTFE_list <- append(bias_MTFE_list, bias_MTFE)
+  
+}
+```
+
+```{r}
+mean(Rmse_causal_effect_list)
+sd(Rmse_causal_effect_list)
+mean(MAPE_list)
+sd(MAPE_list)
+mean(bias_MTFE_list)
+sd(bias_MTFE_list)
+```
+
+
+```{r}
+#### Imbens reg_est 
+
+grid_eval <- seq(0.0, 3.0, length.out = 200)
+true_effect = grid_eval + 2/((1 + grid_eval)**3)
+true_MTFE<- rep(1,200) -6*(1+grid_eval)**(-4)
+
+
+Rmse_causal_effect_list <- numeric(0)
+MAPE_list <- numeric(0)
+bias_MTFE_list <- numeric(0)
+
+for (seed in 1:10){
+  Imbens_sim_data <- Imbens_Sim(N=20000, V_dim=200, seed=seed)
+  reg_estimate <- reg_est(Y = Y,
+                         treat = X,
+                        covar_formula = ~ .-Y-X,
+                        covar_lin_formula = ~ .-Y-X,
+                        covar_sq_formula = ~ .-Y-X,
+                        data = Imbens_sim_data,
+                        degree=2,
+                        method = "same"
+                        )
+  
+  eps <- 0.0001
+  
+  predict_effect <- reg_estimate$param[1] + reg_estimate$param[2] * grid_eval + reg_estimate$param[3] * (grid_eval**2)
+  grid_eval_delta <- grid_eval-eps
+  predict_effect_delta<- reg_estimate$param[1] + reg_estimate$param[2] * grid_eval_delta + reg_estimate$param[3] * (grid_eval_delta**2)
+  
+  MTFE <- (predict_effect-predict_effect_delta)/eps
+  
+  Rmse_causal_effect = sqrt(mean((predict_effect - true_effect)**2))
+  MAPE <- mean(abs((predict_effect-true_effect)/true_effect))
+  bias_MTFE <-mean(abs(MTFE - true_MTFE))
+  
+  Rmse_causal_effect_list<- append(Rmse_causal_effect_list, Rmse_causal_effect)
+  MAPE_list <- append(MAPE_list, MAPE)
+  bias_MTFE_list <- append(bias_MTFE_list, bias_MTFE)
+  
+}
+```
+
+```{r}
+mean(Rmse_causal_effect_list)
+sd(Rmse_causal_effect_list)
+mean(MAPE_list)
+sd(MAPE_list)
+mean(bias_MTFE_list)
+sd(bias_MTFE_list)
+```
+
+
+```{r}
+
+reg_estimate$param[3]
+plot(grid_eval, predict_effect)
+```
+
+```{r}
+#### Bart reg_est 
+
+grid_eval <- seq(0.0, 3.0, length.out = 200)
+true_effect = grid_eval + 2/((1 + grid_eval)**3)
+true_MTFE<- rep(1,200) -6*(1+grid_eval)**(-4)
+
+
+Rmse_causal_effect_list <- numeric(0)
+MAPE_list <- numeric(0)
+bias_MTFE_list <- numeric(0)
+
+for (seed in 1:10){
+  Imbens_sim_data <- Imbens_Sim(N=20000, V_dim=200, seed=seed)
+  bart_estimate <- bart_est(Y = Y,
+                         treat = X,
+                        outcome_formula = Y ~ .,
+                        data = Imbens_sim_data,
+                        grid_eval = grid_eval
+                        )
+  
+  eps <- 0.0001
+  
+  predict_effect <- reg_estimate$param[1] + reg_estimate$param[2] * grid_eval + reg_estimate$param[3] * (grid_eval**2)
+  grid_eval_delta <- grid_eval-eps
+  predict_effect_delta<- reg_estimate$param[1] + reg_estimate$param[2] * grid_eval_delta + reg_estimate$param[3] * (grid_eval_delta**2)
+  
+  MTFE <- (predict_effect-predict_effect_delta)/eps
+  
+  Rmse_causal_effect = sqrt(mean((predict_effect - true_effect)**2))
+  MAPE <- mean(abs((predict_effect-true_effect)/true_effect))
+  bias_MTFE <-mean(abs(MTFE - true_MTFE))
+  
+  Rmse_causal_effect_list<- append(Rmse_causal_effect_list, Rmse_causal_effect)
+  MAPE_list <- append(MAPE_list, MAPE)
+  bias_MTFE_list <- append(bias_MTFE_list, bias_MTFE)
+  
+}
+```
+```{r}
+Imbens_sim_data <- Imbens_Sim(N=200, V_dim=50, seed=1)
+grid_eval <- seq(0.0, 3.0, length.out = 200)
+  bart_estimate <- bart_est(Y = Y,
+                         treat = X,
+                        outcome_formula = Y ~ .,
+                        data = Imbens_sim_data,
+                        grid_val = grid_eval
+                        )
+```
+
+
+```{r}
+#### IPTW
+
+grid_eval <- seq(0.0, 3.0, length.out = 200)
+true_effect = grid_eval + 2/((1 + grid_eval)**3)
+true_MTFE<- rep(1,200) -6*(1+grid_eval)**(-4)
+
+
+Rmse_causal_effect_list <- numeric(0)
+MAPE_list <- numeric(0)
+bias_MTFE_list <- numeric(0)
+
+for (seed in 1:10){
+  Imbens_sim_data <- Imbens_Sim(N=20000, V_dim=4, seed=seed)
+  iptw_estimate <- iptw_est(Y = Y,
+                         treat = X,
+                        treat_formula = X ~ -Y,
+                        
+                        data = Imbens_sim_data,
+                        numerator_formula = X~1,
+                        degree=2,
+                        treat_mod = "Gamma",
+                        link_function = "inverse"
+                        )
+  
+  eps <- 0.0001
+  
+  predict_effect <- iptw_estimate$param[1] + iptw_estimate$param[2] * grid_eval + iptw_estimate$param[3] * (grid_eval**2)
+  grid_eval_delta <- grid_eval-eps
+  predict_effect_delta<- iptw_estimate$param[1] + iptw_estimate$param[2] * grid_eval_delta + iptw_estimate$param[3] * (grid_eval_delta**2)
+
+  MTFE <- (predict_effect-predict_effect_delta)/eps
+
+  Rmse_causal_effect = sqrt(mean((predict_effect - true_effect)**2))
+  MAPE <- mean(abs((predict_effect-true_effect)/true_effect))
+  bias_MTFE <-mean(abs(MTFE - true_MTFE))
+
+  Rmse_causal_effect_list<- append(Rmse_causal_effect_list, Rmse_causal_effect)
+  MAPE_list <- append(MAPE_list, MAPE)
+  bias_MTFE_list <- append(bias_MTFE_list, bias_MTFE)
+
+}
+```
+```{r}
+mean(Rmse_causal_effect_list)
+sd(Rmse_causal_effect_list)
+mean(MAPE_list)
+sd(MAPE_list)
+mean(bias_MTFE_list)
+sd(bias_MTFE_list)
+```
+
