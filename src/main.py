@@ -1,26 +1,16 @@
 import numpy as np
 import pandas as pd
 import random
+import yaml
+import argparse
 from CausalEGM import *
 
 if __name__=="__main__":
-
-    params = {
-        'dataset': 'Sim',
-        'v_dim': 10,
-        'z_dim': 10,
-        'z0_dim': 1,
-        'z1_dim': 2,
-        'z2_dim': 2,
-        'z3_dim': 5,
-        'lr': 2e-4,
-        'bs':32,
-        'alpha':10,
-        'beta':10,
-        'gamma':10,
-        'nb_batches':20000,
-        'has_label': True,
-        'train': True
-    }
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c','--config',type=str, help='the path to config file')
+    args = parser.parse_args()
+    config = args.config
+    with open(config, 'r') as f:
+        params = yaml.load(f)
     model = CausalEGM(params)
     model.train()

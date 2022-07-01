@@ -16,52 +16,35 @@ from sklearn.metrics.cluster import normalized_mutual_info_score, adjusted_rand_
 from sklearn.metrics.cluster import homogeneity_score, adjusted_mutual_info_score
 from sklearn.preprocessing import MinMaxScaler,MaxAbsScaler
 
-class Data_sampler_linear(object):
-    def __init__(self, N = 20000, v_dim=10, z1_dim=3):
-        self.sample_size = N
-        self.v_dim = v_dim
-        self.z1_dim = z1_dim
-        self.data_v = np.random.normal(0,1,size=(N, v_dim))
-        self.alpha = np.ones((z1_dim,1))
-        self.data_x = np.random.normal(np.dot(self.data_v[:,:z1_dim],self.alpha), 0.1) #(N,1)
+def Dataset_selector(name):
+    dic = {'Sim_linear':Sim_linear_sampler,
+            'Sim_quadratic':Sim_quadratic_sampler,
+            'Sim_Hirano_Imbens':Sim_Hirano_Imbens_sampler}
+    return dic[name]
 
-        self.beta = np.ones((z1_dim,1)) 
-        self.ax = 2
-        self.data_y = np.random.normal(self.ax*self.data_x + np.dot(self.data_v[:,2:(z1_dim+2)], self.beta) , 0.1)
-        self.data_x = self.data_x.astype('float32')
-        self.data_y = self.data_y.astype('float32')
-        self.data_v = self.data_v.astype('float32')
-        print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
-        print(np.max(self.data_x),np.max(self.data_y), np.max(self.data_v))
-
-    def train(self, batch_size):
-        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
-        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
-
-    def load_all(self):
-        return self.data_x, self.data_y, self.data_v
-
-
-class Data_sampler_non_linear(object):
-    def __init__(self, N = 20000, v_dim=10, z1_dim=3, ax = 1, bx = 1):
+class Sim_linear_sampler(object):
+    def __init__(self, N = 20000, v_dim=10, z0_dim=1, z1_dim=2, z2_dim=2, z3_dim=5, ax = 1, bx = 1):
         np.random.seed(123)
         self.sample_size = N
         self.v_dim = v_dim
+        self.z0_dim = z0_dim
         self.z1_dim = z1_dim
+        self.z2_dim = z2_dim
+        self.z3_dim = z3_dim
         self.ax = ax
         self.bx = bx
-        self.alpha = np.ones((z1_dim,1))/z1_dim
-        self.beta = np.ones((z1_dim,1))/z1_dim
+        self.alpha = np.ones(((z0_dim+z1_dim),1))
+        self.beta_1 = np.ones((z0_dim,1)) 
+        self.beta_2 = np.ones((z2_dim,1)) 
         self.data_v = np.random.normal(0, 1, size=(N, v_dim))
-        #self.data_x = np.dot(self.data_v[:,:z1_dim],self.alpha)#(N,1)
         self.data_x = self.get_value_x(self.data_v)
-        #self.data_y = np.random.normal(self.bx*self.data_x + self.ax*self.data_x**2 * np.dot(self.data_v[:,:z1_dim], self.beta) , 0.1)
         self.data_y = self.get_value_y(self.data_v, self.data_x)
         self.data_x = self.data_x.astype('float32')
         self.data_y = self.data_y.astype('float32')
         self.data_v = self.data_v.astype('float32')
         print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
-        print(np.max(self.data_x),np.max(self.data_y), np.max(self.data_v))
+        print(np.max(self.data_x),np.max(self.data_y), np.max(self.data_v)) #8.036544 242.13437 4.350001
+        print(np.min(self.data_x),np.min(self.data_y), np.min(self.data_v)) #-7.866399 -261.7619 -4.60713
 
     def train(self, batch_size):
         indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
@@ -69,11 +52,69 @@ class Data_sampler_non_linear(object):
     
     #get x given v(or z1)
     def get_value_x(self, v):
-        return np.random.normal(np.dot(v[:,:self.z1_dim],self.alpha), 0.1)
+        return np.random.normal(np.dot(v[:,:(self.z0_dim + self.z1_dim)],self.alpha), 1)
 
     #get y given x and v(or z1)
     def get_value_y(self, v, x):
-        return np.random.normal(self.bx * x + self.ax* x**2 * np.dot(v[:,4:(4+self.z1_dim)], self.beta) , 0.1)
+        return np.random.normal(self.bx * x + self.ax* x**2 * (np.dot(v[:,:self.z0_dim], self.beta_1) + \
+        np.dot(v[:,(self.z0_dim+self.z1_dim):(self.z0_dim+self.z1_dim+self.z2_dim)], self.beta_2)) , 1)
+
+    def load_all(self):
+        return self.data_x, self.data_y, self.data_v
+
+class Sim_quadratic_sampler(object):
+    def __init__(self, N = 20000, v_dim=25, z0_dim=3, z1_dim=3, z2_dim=3, z3_dim=3, ax = 1, bx = 1):
+        np.random.seed(123)
+        self.sample_size = N
+        self.v_dim = v_dim
+        self.z0_dim = z0_dim
+        self.z1_dim = z1_dim
+        self.z2_dim = z2_dim
+        self.z3_dim = z3_dim
+        self.ax = ax
+        self.bx = bx
+        self.alpha = np.ones(((z0_dim+z1_dim),1))
+        self.beta_1 = np.ones((z0_dim,1)) 
+        self.beta_2 = np.ones((z2_dim,1)) 
+        self.data_v = np.random.normal(0, 1, size=(N, v_dim))
+        self.data_x = self.get_value_x(self.data_v)
+        self.data_y = self.get_value_y(self.data_v, self.data_x)
+        self.data_x = self.data_x.astype('float32')
+        self.data_y = self.data_y.astype('float32')
+        self.data_v = self.data_v.astype('float32')
+        print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
+        print(np.max(self.data_x),np.max(self.data_y), np.max(self.data_v))#10.559797 156.67995 4.350001
+        print(np.min(self.data_x),np.min(self.data_y), np.min(self.data_v))#-10.261807 -9.006005 -4.60713
+
+    def train(self, batch_size):
+        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
+        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
+    
+    #get x given v(or z1)
+    def get_value_x(self, v):
+        return np.random.normal(np.dot(v[:,:(self.z0_dim + self.z1_dim)],self.alpha), 0.1)
+
+    #get y given x and v(or z1)
+    def get_value_y(self, v, x):
+        return np.random.normal(self.bx * x**2 + self.ax* x * (np.dot(v[:,:self.z0_dim], self.beta_1) + \
+        np.dot(v[:,(self.z0_dim+self.z1_dim):(self.z0_dim+self.z1_dim+self.z2_dim)], self.beta_2)) , 0.1)
+
+    def load_all(self):
+        return self.data_x, self.data_y, self.data_v
+
+class Sim_Hirano_Imbens_sampler(object):
+    def __init__(self, N = 20000, v_dim=15, z0_dim=1, z1_dim=1, z2_dim=1):
+        self.data = np.loadtxt('../baselines/Imbens_sim_data.txt',usecols=range(0,17),delimiter='\t')
+        self.sample_size = N
+        self.v_dim = v_dim
+        self.data_v = self.data[:, 0:v_dim].astype('float32')
+        self.data_x = self.data[:, v_dim].reshape(-1, 1).astype('float32')
+        self.data_y = (self.data[:, v_dim+1]).reshape(-1, 1).astype('float32')
+        print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
+
+    def train(self, batch_size):
+        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
+        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
 
     def load_all(self):
         return self.data_x, self.data_y, self.data_v

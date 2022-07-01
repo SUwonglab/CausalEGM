@@ -1,13 +1,12 @@
 import tensorflow as tf
 from . model import BaseFullyConnectedNet, Discriminator
 import numpy as np
-from . util import Gaussian_sampler, Data_sampler_non_linear, Data_sampler_linear
+from . util import *
 import dateutil.tz
 import datetime
 import sys
 import copy
 import os
-
 
 class CausalEGM(object):
     """ CausalEGM model for causal inference.
@@ -34,20 +33,26 @@ class CausalEGM(object):
         self.z_sampler = Gaussian_sampler(N=20000, mean=np.zeros(params['z_dim']), sd=1.0)
 
         #joint sampling v, x, y
-        self.data_sampler = Data_sampler_non_linear(N=20000, v_dim=params['v_dim'])
-        #self.data_sampler = Data_sampler_linear(N=20000, v_dim=params['v_dim'])
+        self.data_sampler = Dataset_selector(params['dataset'])(N=10000, v_dim=params['v_dim'])
 
         self.initilize_nets()
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         self.timestamp = now.strftime('%Y%m%d_%H%M%S')
         
-        self.checkpoint_path = "checkpoints/%s" % self.timestamp
+        self.checkpoint_path = "checkpoints/{}/{}_v_dim={}_z_dim={}_{}_{}_{}".format(
+            params['dataset'], self.timestamp, params['v_dim'],
+            params['z0_dim'],params['z1_dim'],params['z2_dim'],params['z3_dim'])
+
         if not os.path.exists(self.checkpoint_path):
             os.makedirs(self.checkpoint_path)
         
-        self.save_dir = "results/%s" % self.timestamp
+        self.save_dir = "results/{}/{}_v_dim={}_z_dim={}_{}_{}_{}".format(
+            params['dataset'], self.timestamp, params['v_dim'],
+            params['z0_dim'],params['z1_dim'],params['z2_dim'],params['z3_dim'])
+
         if not os.path.exists(self.save_dir):
             os.makedirs(self.save_dir)   
+
         ckpt = tf.train.Checkpoint(g_net = self.g_net,
                                    e_net = self.e_net,
                                    dz_net = self.dz_net,
@@ -206,7 +211,7 @@ class CausalEGM(object):
                 ckpt_save_path = self.ckpt_manager.save()
                 print ('Saving checkpoint for epoch {} at {}'.format(batch_idx,ckpt_save_path))
 
-    def evaluate(self, batch_idx, num_per_dim=3000, x_min=-5, x_max=5, nb_intervals=200):
+    def evaluate(self, batch_idx, num_per_dim=3000, nb_intervals=200):
         data_x, data_y, data_v = self.data_sampler.load_all()
         data_z = self.z_sampler.train(len(data_x))
         data_v_ = self.g_net(data_z)
@@ -218,7 +223,7 @@ class CausalEGM(object):
         np.savez('{}/data_at_{}.npz'.format(self.save_dir, batch_idx),data_v_,data_z_)
         #average causal effect
         average_causal_effect = []
-        for x in np.linspace(x_min, x_max, nb_intervals):
+        for x in np.linspace(self.params['x_min'], self.params['x_max'], nb_intervals):
             data_x = np.tile(x, (self.data_sampler.sample_size, 1))
             y_pred = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
             average_causal_effect.append(np.mean(y_pred))
