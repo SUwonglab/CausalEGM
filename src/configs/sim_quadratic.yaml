@@ -1,0 +1,16 @@
+dataset: Sim_quadratic
+v_dim: 15
+z_dim: 12
+z0_dim: 3
+z1_dim: 3
+z2_dim: 3
+z3_dim: 3
+x_min: -10
+x_max: 10
+lr: 0.0002
+bs: 32
+alpha: 10
+beta: 10
+gamma: 10
+nb_batches: 200000
+train: True

@@ -1,0 +1,16 @@
+dataset: Sim_linear
+v_dim: 15
+z_dim: 10
+z0_dim: 2
+z1_dim: 2
+z2_dim: 2
+z3_dim: 4
+x_min: -5
+x_max: 5
+lr: 0.0002
+bs: 32
+alpha: 10
+beta: 10
+gamma: 10
+nb_batches: 200000
+train: True
