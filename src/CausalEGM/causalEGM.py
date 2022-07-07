@@ -123,6 +123,8 @@ class CausalEGM(object):
 
             data_y_ = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
             data_x_ = self.h_net(tf.concat([data_z0, data_z1], axis=-1))
+            if self.params['binary_treatment']:
+                data_x_ = tf.sigmoid(data_x_)
             l2_loss_x = tf.reduce_mean((data_x_ - data_x)**2)
             l2_loss_y = tf.reduce_mean((data_y_ - data_y)**2)
             g_e_loss = g_loss_adv+e_loss_adv+self.params['alpha']*(l2_loss_v + l2_loss_z) \
@@ -211,7 +213,7 @@ class CausalEGM(object):
                 ckpt_save_path = self.ckpt_manager.save()
                 print ('Saving checkpoint for epoch {} at {}'.format(batch_idx,ckpt_save_path))
 
-    def evaluate(self, batch_idx, num_per_dim=3000, nb_intervals=200):
+    def evaluate(self, batch_idx, nb_intervals=200):
         data_x, data_y, data_v = self.data_sampler.load_all()
         data_z = self.z_sampler.train(len(data_x))
         data_v_ = self.g_net(data_z)
@@ -221,10 +223,18 @@ class CausalEGM(object):
         data_z2 = data_z_[:,(self.params['z0_dim']+self.params['z1_dim']):(self.params['z0_dim']+self.params['z1_dim']+self.params['z2_dim'])]
         data_z3 = data_z_[:-self.params['z3_dim']:]
         np.savez('{}/data_at_{}.npz'.format(self.save_dir, batch_idx),data_v_,data_z_)
-        #average causal effect
-        average_causal_effect = []
-        for x in np.linspace(self.params['x_min'], self.params['x_max'], nb_intervals):
-            data_x = np.tile(x, (self.data_sampler.sample_size, 1))
-            y_pred = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
-            average_causal_effect.append(np.mean(y_pred))
-        np.save('{}/causal_effect_at_{}.npy'.format(self.save_dir, batch_idx), np.array(average_causal_effect))
+        
+        if self.params['binary_treatment']:
+            #average treatment effect (ATE)
+            y_pred_pos = self.f_net(tf.concat([data_z0, data_z2, np.ones((self.data_sampler.sample_size,1))], axis=-1))
+            y_pred_neg = self.f_net(tf.concat([data_z0, data_z2, np.zeros((self.data_sampler.sample_size,1))], axis=-1))
+            average_treatment_effect = np.mean(y_pred_pos-y_pred_neg)
+            np.save('{}/ATE_at_{}.npy'.format(self.save_dir, batch_idx), average_treatment_effect)
+        else:
+            #average dose response function (ADRF)
+            dose_response = []
+            for x in np.linspace(self.params['x_min'], self.params['x_max'], nb_intervals):
+                data_x = np.tile(x, (self.data_sampler.sample_size, 1))
+                y_pred = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
+                dose_response.append(np.mean(y_pred))
+            np.save('{}/average_ADRF_at_{}.npy'.format(self.save_dir, batch_idx), np.array(dose_response))
