@@ -14,3 +14,4 @@ beta: 10
 gamma: 10
 nb_batches: 200000
 train: True
+binary_treatment: False
