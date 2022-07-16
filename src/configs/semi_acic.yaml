@@ -1,0 +1,15 @@
+dataset: Semi_acic
+v_dim: 177
+z_dim: 20
+z0_dim: 10
+z1_dim: 3
+z2_dim: 3
+z3_dim: 4
+lr: 0.0002
+bs: 32
+alpha: 10
+beta: 10
+gamma: 10
+nb_batches: 100000
+train: True
+binary_treatment: True
