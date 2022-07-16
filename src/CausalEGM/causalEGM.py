@@ -225,11 +225,11 @@ class CausalEGM(object):
         np.savez('{}/data_at_{}.npz'.format(self.save_dir, batch_idx),data_v_,data_z_)
         
         if self.params['binary_treatment']:
-            #average treatment effect (ATE)
+            #individual treatment effect (ITE) && average treatment effect (ATE)
             y_pred_pos = self.f_net(tf.concat([data_z0, data_z2, np.ones((self.data_sampler.sample_size,1))], axis=-1))
             y_pred_neg = self.f_net(tf.concat([data_z0, data_z2, np.zeros((self.data_sampler.sample_size,1))], axis=-1))
             average_treatment_effect = np.mean(y_pred_pos-y_pred_neg)
-            np.save('{}/ATE_at_{}.npy'.format(self.save_dir, batch_idx), average_treatment_effect)
+            np.savez('{}/ITE_at_{}.npz'.format(self.save_dir, batch_idx), y_pred_pos, y_pred_neg)
         else:
             #average dose response function (ADRF)
             dose_response = []
