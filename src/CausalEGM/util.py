@@ -14,12 +14,13 @@ from sklearn.metrics import pairwise_distances
 from sklearn.cluster import KMeans
 from sklearn.metrics.cluster import normalized_mutual_info_score, adjusted_rand_score
 from sklearn.metrics.cluster import homogeneity_score, adjusted_mutual_info_score
-from sklearn.preprocessing import MinMaxScaler,MaxAbsScaler
+from sklearn.preprocessing import MinMaxScaler,MaxAbsScaler,StandardScaler
 
 def Dataset_selector(name):
     dic = {'Sim_linear':Sim_linear_sampler,
             'Sim_quadratic':Sim_quadratic_sampler,
-            'Sim_Hirano_Imbens':Sim_Hirano_Imbens_sampler}
+            'Sim_Hirano_Imbens':Sim_Hirano_Imbens_sampler,
+            'Semi_acic':Semi_acic_sampler}
     return dic[name]
 
 class Sim_linear_sampler(object):
@@ -118,6 +119,37 @@ class Sim_Hirano_Imbens_sampler(object):
 
     def load_all(self):
         return self.data_x, self.data_y, self.data_v
+
+class Semi_acic_sampler(object):
+    def __init__(self, N = 20000, v_dim=117, z0_dim=1, z1_dim=1, z2_dim=1,
+                path='../data/ACIC_2018', ufid='5d4cabab88b247d1b48cd38b46555b2c'):
+        self.df_covariants = pd.read_csv('%s/x.csv'%path, index_col='sample_id',header=0, sep=',')
+        self.df_sim = pd.read_csv('%s/scaling/factuals/%s.csv'%(path, ufid),index_col='sample_id',header=0, sep=',')
+        dataset = self.df_covariants.join(self.df_sim, how='inner')
+        self.data_x = dataset['z'].values.reshape(-1,1)
+        self.data_y = dataset['y'].values.reshape(-1,1)
+        self.data_v = dataset.values[:,:-2]
+        self.data_v = self.normalize(self.data_v)
+
+        self.sample_size = len(self.data_x)
+        self.v_dim = v_dim
+        self.data_v = self.data_v.astype('float32')
+        self.data_x = self.data_x.astype('float32')
+        self.data_y = self.data_y.astype('float32')
+        print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
+
+    def normalize(self, data):
+        normal_scalar = StandardScaler()
+        data = normal_scalar.fit_transform(data)
+        return data
+
+    def train(self, batch_size):
+        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
+        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
+
+    def load_all(self):
+        return self.data_x, self.data_y, self.data_v
+
 
 class Gaussian_sampler(object):
     def __init__(self, N, mean, sd=1):
