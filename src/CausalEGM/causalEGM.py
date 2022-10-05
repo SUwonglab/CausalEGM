@@ -4,9 +4,9 @@ import numpy as np
 from . util import *
 import dateutil.tz
 import datetime
-import sys
-import copy
 import os
+tf.keras.utils.set_random_seed(123)
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
 class CausalEGM(object):
     """ CausalEGM model for causal inference.
@@ -15,39 +15,36 @@ class CausalEGM(object):
         super(CausalEGM, self).__init__()
         self.params = params
         self.g_net = BaseFullyConnectedNet(input_dim=params['z_dim'],output_dim = params['v_dim'], 
-                                        model_name='g_net', nb_units=[64]*5)
+                                        model_name='g_net', nb_units=params['g_units'])
         self.e_net = BaseFullyConnectedNet(input_dim=params['v_dim'],output_dim = params['z_dim'], 
-                                        model_name='e_net', nb_units=[64]*5)
+                                        model_name='e_net', nb_units=params['e_units'])
         self.dz_net = Discriminator(input_dim=params['z_dim'],model_name='dz_net',
-                                        nb_units=[32]*3)
+                                        nb_units=params['dz_units'])
         self.dv_net = Discriminator(input_dim=params['v_dim'],model_name='dv_net',
-                                        nb_units=[32]*3)
+                                        nb_units=params['dv_units'])
 
         self.f_net = BaseFullyConnectedNet(input_dim=1+params['z0_dim']+params['z2_dim'],
-                                        output_dim = 1, model_name='f_net', nb_units=[64]*5)
+                                        output_dim = 1, model_name='f_net', nb_units=params['f_units'])
         self.h_net = BaseFullyConnectedNet(input_dim=params['z0_dim']+params['z1_dim'],
-                                        output_dim = 1, model_name='h_net', nb_units=[64]*5)
+                                        output_dim = 1, model_name='h_net', nb_units=params['h_units'])
 
         self.g_e_optimizer = tf.keras.optimizers.Adam(params['lr'], beta_1=0.5, beta_2=0.9)
         self.d_optimizer = tf.keras.optimizers.Adam(params['lr'], beta_1=0.5, beta_2=0.9)
-        self.z_sampler = Gaussian_sampler(N=20000, mean=np.zeros(params['z_dim']), sd=1.0)
-
-        #joint sampling v, x, y
-        self.data_sampler = Dataset_selector(params['dataset'])(N=10000, v_dim=params['v_dim'])
+        self.z_sampler = Gaussian_sampler(mean=np.zeros(params['z_dim']), sd=1.0)
 
         self.initilize_nets()
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         self.timestamp = now.strftime('%Y%m%d_%H%M%S')
         
-        self.checkpoint_path = "checkpoints/{}/{}_v_dim={}_z_dim={}_{}_{}_{}".format(
-            params['dataset'], self.timestamp, params['v_dim'],
+        self.checkpoint_path = "{}/checkpoints/{}/{}_v_dim={}_z_dim={}_{}_{}_{}".format(
+            params['output_dir'], params['dataset'], self.timestamp, params['v_dim'],
             params['z0_dim'],params['z1_dim'],params['z2_dim'],params['z3_dim'])
 
         if not os.path.exists(self.checkpoint_path):
             os.makedirs(self.checkpoint_path)
         
-        self.save_dir = "results/{}/{}_v_dim={}_z_dim={}_{}_{}_{}".format(
-            params['dataset'], self.timestamp, params['v_dim'],
+        self.save_dir = "{}/results/{}/{}_v_dim={}_z_dim={}_{}_{}_{}".format(
+            params['output_dir'], params['dataset'], self.timestamp, params['v_dim'],
             params['z0_dim'],params['z1_dim'],params['z2_dim'],params['z3_dim'])
 
         if not os.path.exists(self.save_dir):
@@ -119,7 +116,6 @@ class CausalEGM(object):
             
             g_loss_adv = -tf.reduce_mean(data_dv_)
             e_loss_adv = -tf.reduce_mean(data_dz_)
-            
 
             data_y_ = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
             data_x_ = self.h_net(tf.concat([data_z0, data_z1], axis=-1))
@@ -127,8 +123,9 @@ class CausalEGM(object):
                 data_x_ = tf.sigmoid(data_x_)
             l2_loss_x = tf.reduce_mean((data_x_ - data_x)**2)
             l2_loss_y = tf.reduce_mean((data_y_ - data_y)**2)
-            g_e_loss = g_loss_adv+e_loss_adv+self.params['alpha']*(l2_loss_v + l2_loss_z) \
+            g_e_loss = self.params['use_v_gan']*g_loss_adv+e_loss_adv+self.params['alpha']*(l2_loss_v + self.params['use_z_rec']*l2_loss_z) \
                         + self.params['beta']*(l2_loss_x+l2_loss_y)
+
         # Calculate the gradients for generators and discriminators
         g_e_gradients = gen_tape.gradient(g_e_loss, self.g_net.trainable_variables+self.e_net.trainable_variables+\
                                         self.f_net.trainable_variables+self.h_net.trainable_variables)
@@ -177,7 +174,8 @@ class CausalEGM(object):
             grad_norm_v = tf.sqrt(tf.reduce_sum(tf.square(grad_v), axis=1))#(bs,) 
             gpv_loss = tf.reduce_mean(tf.square(grad_norm_v - 1.0))
             
-            d_loss = dv_loss + dz_loss + self.params['gamma']*(gpz_loss+gpv_loss)
+            d_loss = self.params['use_v_gan']*dv_loss + dz_loss + \
+                    self.params['gamma']*(gpz_loss + self.params['use_v_gan']*gpv_loss)
 
         # Calculate the gradients for generators and discriminators
         d_gradients = disc_tape.gradient(d_loss, self.dz_net.trainable_variables+self.dv_net.trainable_variables)
@@ -186,22 +184,31 @@ class CausalEGM(object):
         self.d_optimizer.apply_gradients(zip(d_gradients, self.dz_net.trainable_variables+self.dv_net.trainable_variables))
         return dv_loss, dz_loss, d_loss
 
-    def train(self): 
-        batches_per_eval = 500
-        ratio = 0.2
+    def train(self, data=None, data_file=None, sep='\t', header=0, normalize=False):
+        if data is None and data_file is None:
+            self.data_sampler = Dataset_selector(self.params['dataset'])(N=10000, v_dim=self.params['v_dim'])
+        elif data is not None:
+            if len(data) != 3:
+                print('Data imcomplete error, please provide pair-wise (X, Y, V) in a list or tuple.')
+                sys.exit()
+            else:
+                self.data_sampler = Custom_sampler(x=data[0],y=data[1],v=data[2],normalize=normalize)
+        else:
+            data = parse_file(data_file, sep, header, normalize)
+            self.data_sampler = Custom_sampler(x=data[0],y=data[1],v=data[2])
         batch_size = self.params['bs']
         f_log = open('%s/log.txt'%self.save_dir,'a+')
         for batch_idx in range(self.params['nb_batches']):
-            for _ in range(5):
+            for _ in range(self.params['g_d_freq']):
                 batch_x, batch_y, batch_v = self.data_sampler.train(batch_size)
-                batch_z = self.z_sampler.train(batch_size)
+                batch_z = self.z_sampler.get_batch(batch_size)
                 dv_loss, dz_loss, d_loss = self.train_disc_step(batch_z, batch_v)
 
             batch_x, batch_y, batch_v = self.data_sampler.train(batch_size)
-            batch_z = self.z_sampler.train(batch_size)         
+            batch_z = self.z_sampler.get_batch(batch_size)         
             g_loss_adv, e_loss_adv, l2_loss_v, l2_loss_z, l2_loss_x, l2_loss_y, g_e_loss = self.train_gen_step(batch_z, batch_v, batch_x, batch_y)
 
-            if batch_idx % batches_per_eval == 0:
+            if batch_idx % self.params['batches_per_eval'] == 0:
                 contents = '''Batches [%d] : g_loss_adv [%.4f], e_loss_adv [%.4f],\
                 l2_loss_v [%.4f], l2_loss_z [%.4f], l2_loss_x [%.4f],\
                 l2_loss_y [%.4f], g_e_loss [%.4f], dv_loss [%.4f], dz_loss [%.4f], d_loss [%.4f]''' \
@@ -215,14 +222,14 @@ class CausalEGM(object):
 
     def evaluate(self, batch_idx, nb_intervals=200):
         data_x, data_y, data_v = self.data_sampler.load_all()
-        data_z = self.z_sampler.train(len(data_x))
+        data_z = self.z_sampler.get_batch(len(data_x))
         data_v_ = self.g_net(data_z)
         data_z_ = self.e_net(data_v)
         data_z0 = data_z_[:,:self.params['z0_dim']]
         data_z1 = data_z_[:,self.params['z0_dim']:(self.params['z0_dim']+self.params['z1_dim'])]
         data_z2 = data_z_[:,(self.params['z0_dim']+self.params['z1_dim']):(self.params['z0_dim']+self.params['z1_dim']+self.params['z2_dim'])]
         data_z3 = data_z_[:-self.params['z3_dim']:]
-        np.savez('{}/data_at_{}.npz'.format(self.save_dir, batch_idx),data_v_,data_z_)
+        #np.savez('{}/data_at_{}.npz'.format(self.save_dir, batch_idx),data_v_,data_z_)
         
         if self.params['binary_treatment']:
             #individual treatment effect (ITE) && average treatment effect (ATE)

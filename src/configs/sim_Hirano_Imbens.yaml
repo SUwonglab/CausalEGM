@@ -1,4 +1,5 @@
 dataset: Sim_Hirano_Imbens
+output_dir: './'
 v_dim: 15
 z_dim: 6
 z0_dim: 1
@@ -12,6 +13,15 @@ bs: 32
 alpha: 10
 beta: 10
 gamma: 10
-nb_batches: 200000
-train: True
+nb_batches: 1000
+batches_per_eval: 100
+g_d_freq: 5
+g_units: [64,64,64,64,64]
+e_units: [64,64,64,64,64]
+f_units: [64,64,64,64,64]
+h_units: [64,64,64,64,64]
+dz_units: [32,32,32]
+dv_units: [32,32,32]
 binary_treatment: False
+use_z_rec: True
+use_v_gan: True

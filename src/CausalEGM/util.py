@@ -1,27 +1,39 @@
 import numpy as np
-import scipy.sparse as sp 
-import scipy.io
+import os
 import copy
-from scipy import pi
 import sys
 import pandas as pd
-from os.path import join
-import gzip
-from scipy.io import mmwrite,mmread
-from sklearn.decomposition import PCA,TruncatedSVD
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.metrics import pairwise_distances
-from sklearn.cluster import KMeans
-from sklearn.metrics.cluster import normalized_mutual_info_score, adjusted_rand_score
-from sklearn.metrics.cluster import homogeneity_score, adjusted_mutual_info_score
 from sklearn.preprocessing import MinMaxScaler,MaxAbsScaler,StandardScaler
 
 def Dataset_selector(name):
-    dic = {'Sim_linear':Sim_linear_sampler,
-            'Sim_quadratic':Sim_quadratic_sampler,
-            'Sim_Hirano_Imbens':Sim_Hirano_Imbens_sampler,
-            'Semi_acic':Semi_acic_sampler}
-    return dic[name]
+    if 'acic' in name:
+        return Semi_acic_sampler
+    elif 'ihdp' in name:
+        return Semi_ihdp_sampler
+    elif 'Hirano' in name:
+        return Sim_Hirano_Imbens_sampler
+    elif 'quadratic' in name:
+        return Sim_quadratic_sampler
+    elif 'linear' in name:
+        return Sim_linear_sampler
+    else:
+        print('Cannot find the example data sampler: %s!'%name)
+        sys.exit()
+
+class Custom_sampler(object):
+    def __init__(self, x, y, v, normalize=False):
+        assert len(x)==len(y)==len(v)
+        self.data_x = x.astype('float32')
+        self.data_y = y.astype('float32')
+        self.data_v = v.astype('float32')
+        if normalize:
+            self.data_v = StandardScaler().fit_transform(self.data_v)
+        self.sample_size = len(x)
+    def train(self, batch_size):
+        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
+        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
+    def load_all(self):
+        return self.data_x, self.data_y, self.data_v
 
 class Sim_linear_sampler(object):
     def __init__(self, N = 20000, v_dim=10, z0_dim=1, z1_dim=2, z2_dim=2, z3_dim=5, ax = 1, bx = 1):
@@ -112,6 +124,11 @@ class Sim_Hirano_Imbens_sampler(object):
         self.data_x = self.data[:, v_dim].reshape(-1, 1).astype('float32')
         self.data_y = (self.data[:, v_dim+1]).reshape(-1, 1).astype('float32')
         print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
+        np.savez('../baselines/data.npz',x=self.data_x, y=self.data_y, v=self.data_v)
+        np.savetxt('../baselines/data.txt', np.concatenate([self.data_x, self.data_y, self.data_v],axis=1), delimiter='\t')
+        data_pd = pd.DataFrame(np.concatenate([self.data_x, self.data_y, self.data_v],axis=1),columns=['x','y']+['v%d'%i for i in range(v_dim)])
+        data_pd.to_csv('../baselines/data.csv',sep='\t',index=False)
+
 
     def train(self, batch_size):
         indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
@@ -150,9 +167,29 @@ class Semi_acic_sampler(object):
     def load_all(self):
         return self.data_x, self.data_y, self.data_v
 
+class Semi_ihdp_sampler(object):
+    def __init__(self, N = 20000, v_dim=25, path='../data/IHDP_100', ufid='ihdp_npci_1'):
+        self.data_all = np.loadtxt('%s/%s.csv'%(path, ufid), delimiter=',')
+        self.data_x = self.data_all[:,0].reshape(-1,1)
+        self.data_v = self.data_all[:,5:]
+        self.data_y = self.data_all[:,1].reshape(-1,1)
+        self.sample_size = len(self.data_x)
+        self.v_dim = v_dim
+        self.data_v = self.data_v.astype('float32')
+        self.data_x = self.data_x.astype('float32')
+        self.data_y = self.data_y.astype('float32')
+        print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
+
+    def train(self, batch_size):
+        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
+        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
+
+    def load_all(self):
+        return self.data_x, self.data_y, self.data_v
+
 
 class Gaussian_sampler(object):
-    def __init__(self, N, mean, sd=1):
+    def __init__(self, mean, sd=1, N=20000):
         self.total_size = N
         self.mean = mean
         self.sd = sd
@@ -166,7 +203,7 @@ class Gaussian_sampler(object):
         return self.X[indx, :]
 
     def get_batch(self,batch_size):
-        return np.random.normal(self.mean, self.sd, (batch_size,len(self.mean)))
+        return np.random.normal(self.mean, self.sd, (batch_size,len(self.mean))).astype('float32')
 
     def load_all(self):
         return self.X, self.Y
@@ -246,32 +283,24 @@ class Mixture_sampler_v2(object):
     def load_all(self):
         return self.X_c, self.X_d, self.label_idx
     
-def softmax(x):
-    """ softmax function """
-    # assert(len(x.shape) > 1, "dimension must be larger than 1")
-    # print(np.max(x, axis = 1, keepdims = True)) # axis = 1
-    x -= np.max(x, axis = 1, keepdims = True)
-    x = np.exp(x) / np.sum(np.exp(x), axis = 1, keepdims = True)
-    return x
-
-#get a batch of data from previous 50 batches, add stochastic
-class DataPool(object):
-    def __init__(self, maxsize=50):
-        self.maxsize = maxsize
-        self.nb_batch = 0
-        self.pool = []
-
-    def __call__(self, data):
-        if self.nb_batch < self.maxsize:
-            self.pool.append(data)
-            self.nb_batch += 1
-            return data
-        if np.random.rand() > 0.5:
-            results=[]
-            for i in range(len(data)):
-                idx = int(np.random.rand()*self.maxsize)
-                results.append(copy.copy(self.pool[idx])[i])
-                self.pool[idx][i] = data[i]
-            return results
-        else:
-            return data
+def parse_file(path, sep='\t', header = 0, normalize=True):
+    assert os.path.exists(path)
+    if path[-3:] == 'npz':
+        data = np.load(path)
+        data_x, data_y, data_v = data['x'],data['y'],data['v']
+    elif  path[-3:] == 'csv':
+        data = pd.read_csv(path, header=0, sep=sep).values
+        data_x = data[:,0].reshape(-1, 1).astype('float32')
+        data_y = data[:,1].reshape(-1, 1).astype('float32')
+        data_v = data[:,2:].astype('float32')
+    elif path[-3:] == 'txt':
+        data = np.loadtxt(path,delimiter=sep)
+        data_x = data[:,0].reshape(-1, 1).astype('float32')
+        data_y = data[:,1].reshape(-1, 1).astype('float32')
+        data_v = data[:,2:].astype('float32')
+    else:
+        print('File format not recognized, please use .npz, .csv or .txt as input.')
+        sys.exit()
+    if normalize:
+        data_v = StandardScaler().fit_transform(data_v)
+    return data_x, data_y, data_v
