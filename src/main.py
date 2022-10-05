@@ -1,6 +1,3 @@
-import numpy as np
-import pandas as pd
-import random
 import yaml
 import argparse
 from CausalEGM import *
@@ -14,3 +11,5 @@ if __name__=="__main__":
         params = yaml.load(f)
     model = CausalEGM(params)
     model.train()
+    #model.train(data_file='../baselines/data.csv')
+    #model.train(data_file='../baselines/data.txt')
