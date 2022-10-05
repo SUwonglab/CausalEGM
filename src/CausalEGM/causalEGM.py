@@ -5,15 +5,16 @@ from . util import *
 import dateutil.tz
 import datetime
 import os
-tf.keras.utils.set_random_seed(123)
-os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
 class CausalEGM(object):
     """ CausalEGM model for causal inference.
     """
-    def __init__(self, params):
+    def __init__(self, params, random_seed=None):
         super(CausalEGM, self).__init__()
         self.params = params
+        if random_seed is not None:
+            tf.keras.utils.set_random_seed(random_seed)
+            os.environ['TF_DETERMINISTIC_OPS'] = '1'
         self.g_net = BaseFullyConnectedNet(input_dim=params['z_dim'],output_dim = params['v_dim'], 
                                         model_name='g_net', nb_units=params['g_units'])
         self.e_net = BaseFullyConnectedNet(input_dim=params['v_dim'],output_dim = params['z_dim'], 

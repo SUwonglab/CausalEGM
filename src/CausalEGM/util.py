@@ -1,6 +1,5 @@
 import numpy as np
 import os
-import copy
 import sys
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler,MaxAbsScaler,StandardScaler

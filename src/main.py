@@ -9,7 +9,7 @@ if __name__=="__main__":
     config = args.config
     with open(config, 'r') as f:
         params = yaml.load(f)
-    model = CausalEGM(params)
+    model = CausalEGM(params,random_seed=123)
     model.train()
     #model.train(data_file='../baselines/data.csv')
     #model.train(data_file='../baselines/data.txt')
