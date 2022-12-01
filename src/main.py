@@ -11,5 +11,4 @@ if __name__=="__main__":
         params = yaml.load(f)
     model = CausalEGM(params,random_seed=123)
     model.train()
-    #model.train(data_file='../baselines/data.csv')
-    #model.train(data_file='../baselines/data.txt')
+
