@@ -1,4 +1,5 @@
 dataset: Sim_linear
+output_dir: './'
 v_dim: 15
 z_dim: 10
 z0_dim: 2
@@ -13,5 +14,14 @@ alpha: 10
 beta: 10
 gamma: 10
 nb_batches: 200000
-train: True
+batches_per_eval: 2000
+g_d_freq: 5
+g_units: [64,64,64,64,64]
+e_units: [64,64,64,64,64]
+f_units: [64,64,64,64,64]
+h_units: [64,64,64,64,64]
+dz_units: [32,32,32]
+dv_units: [32,32,32]
 binary_treatment: False
+use_z_rec: False
+use_v_gan: False
