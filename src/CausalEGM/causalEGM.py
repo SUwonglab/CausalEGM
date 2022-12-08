@@ -187,7 +187,7 @@ class CausalEGM(object):
 
     def train(self, data=None, data_file=None, sep='\t', header=0, normalize=False):
         if data is None and data_file is None:
-            self.data_sampler = Dataset_selector(self.params['dataset'])(N=10000, v_dim=self.params['v_dim'])
+            self.data_sampler = Dataset_selector(self.params['dataset'])(batch_size=self.params['bs'],ufid=self.params['ufid'])
         elif data is not None:
             if len(data) != 3:
                 print('Data imcomplete error, please provide pair-wise (X, Y, V) in a list or tuple.')
@@ -197,16 +197,17 @@ class CausalEGM(object):
         else:
             data = parse_file(data_file, sep, header, normalize)
             self.data_sampler = Custom_sampler(x=data[0],y=data[1],v=data[2])
-        batch_size = self.params['bs']
+        
         f_log = open('%s/log.txt'%self.save_dir,'a+')
+        f_log.write(str(self.params))
         for batch_idx in range(self.params['nb_batches']):
             for _ in range(self.params['g_d_freq']):
-                batch_x, batch_y, batch_v = self.data_sampler.train(batch_size)
-                batch_z = self.z_sampler.get_batch(batch_size)
+                batch_x, batch_y, batch_v = self.data_sampler.next_batch()
+                batch_z = self.z_sampler.get_batch(len(batch_x))
                 dv_loss, dz_loss, d_loss = self.train_disc_step(batch_z, batch_v)
 
-            batch_x, batch_y, batch_v = self.data_sampler.train(batch_size)
-            batch_z = self.z_sampler.get_batch(batch_size)         
+            batch_x, batch_y, batch_v = self.data_sampler.next_batch()
+            batch_z = self.z_sampler.get_batch(len(batch_x))
             g_loss_adv, e_loss_adv, l2_loss_v, l2_loss_z, l2_loss_x, l2_loss_y, g_e_loss = self.train_gen_step(batch_z, batch_v, batch_x, batch_y)
 
             if batch_idx % self.params['batches_per_eval'] == 0:
@@ -216,13 +217,15 @@ class CausalEGM(object):
                 %(batch_idx, g_loss_adv, e_loss_adv, l2_loss_v, l2_loss_z, l2_loss_x, l2_loss_y, g_e_loss,
                 dv_loss, dz_loss, d_loss)
                 print(contents)
-                f_log.write(contents+'\n')
-                self.evaluate(batch_idx)
-                ckpt_save_path = self.ckpt_manager.save()
-                print ('Saving checkpoint for epoch {} at {}'.format(batch_idx,ckpt_save_path))
+                mse_x, mse_y = self.evaluate(self.data_sampler.load_all(), batch_idx)
+                val_mse_x, val_mse_y = self.evaluate(self.data_sampler.held_out(), batch_idx, val_mode=True)
+                f_log.write('%d\t%.4f\t%.4f\t%.4f\t%.4f\n'%(batch_idx,val_mse_x,val_mse_y,mse_x,mse_y))
+                #ckpt_save_path = self.ckpt_manager.save()
+                #print ('Saving checkpoint for epoch {} at {}'.format(batch_idx,ckpt_save_path))
+        f_log.close()
 
-    def evaluate(self, batch_idx, nb_intervals=200):
-        data_x, data_y, data_v = self.data_sampler.load_all()
+    def evaluate(self, data, batch_idx, val_mode=False, nb_intervals=200):
+        data_x, data_y, data_v = data
         data_z = self.z_sampler.get_batch(len(data_x))
         data_v_ = self.g_net(data_z)
         data_z_ = self.e_net(data_v)
@@ -231,22 +234,28 @@ class CausalEGM(object):
         data_z2 = data_z_[:,(self.params['z0_dim']+self.params['z1_dim']):(self.params['z0_dim']+self.params['z1_dim']+self.params['z2_dim'])]
         data_z3 = data_z_[:-self.params['z3_dim']:]
         #np.savez('{}/data_at_{}.npz'.format(self.save_dir, batch_idx),data_v_,data_z_)
-        
+        data_y_pred = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
+        data_x_pred = self.h_net(tf.concat([data_z0, data_z1], axis=-1))
         if self.params['binary_treatment']:
-            #individual treatment effect (ITE) && average treatment effect (ATE)
-            y_pred_pos = self.f_net(tf.concat([data_z0, data_z2, np.ones((self.data_sampler.sample_size,1))], axis=-1))
-            y_pred_neg = self.f_net(tf.concat([data_z0, data_z2, np.zeros((self.data_sampler.sample_size,1))], axis=-1))
-            average_treatment_effect = np.mean(y_pred_pos-y_pred_neg)
-            np.savez('{}/ITE_at_{}.npz'.format(self.save_dir, batch_idx), y_pred_pos, y_pred_neg)
-        else:
-            #average dose response function (ADRF)
-            dose_response = []
-            for x in np.linspace(self.params['x_min'], self.params['x_max'], nb_intervals):
-                data_x = np.tile(x, (self.data_sampler.sample_size, 1))
-                y_pred = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
-                dose_response.append(np.mean(y_pred))
-            np.save('{}/average_ADRF_at_{}.npy'.format(self.save_dir, batch_idx), np.array(dose_response))
-
+            data_x_pred = tf.sigmoid(data_x_pred)
+        mse_x = np.mean((data_x-data_x_pred)**2)
+        mse_y = np.mean((data_y-data_y_pred)**2)
+        if not val_mode:
+            if self.params['binary_treatment']:
+                #individual treatment effect (ITE) && average treatment effect (ATE)
+                y_pred_pos = self.f_net(tf.concat([data_z0, data_z2, np.ones((len(data_x),1))], axis=-1))
+                y_pred_neg = self.f_net(tf.concat([data_z0, data_z2, np.zeros((len(data_x),1))], axis=-1))
+                average_treatment_effect = np.mean(y_pred_pos-y_pred_neg)
+                np.savez('{}/ITE_at_{}.npz'.format(self.save_dir, batch_idx), y_pred_pos, y_pred_neg)
+            else:
+                #average dose response function (ADRF)
+                dose_response = []
+                for x in np.linspace(self.params['x_min'], self.params['x_max'], nb_intervals):
+                    data_x = np.tile(x, (len(data_x), 1))
+                    y_pred = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
+                    dose_response.append(np.mean(y_pred))
+                np.save('{}/average_ADRF_at_{}.npy'.format(self.save_dir, batch_idx), np.array(dose_response))
+        return mse_x, mse_y
 
 class SimCausalEGM(object):
     """ simulation example for verify the Assump.4.
@@ -450,13 +459,14 @@ class SimCausalEGM(object):
         #self.data_sampler = Assump_valid_sampler(v_dim=self.params['v_dim'], z_dim=self.params['z_dim'],N=10000, n_heldout=2000)
         batch_size = self.params['bs']
         f_log = open('%s/log.txt'%self.save_dir,'a+')
+
         for batch_idx in range(self.params['nb_batches']):
             for _ in range(self.params['g_d_freq']):
-                batch_v, batch_t = self.data_sampler.train(batch_size)
+                batch_v, batch_t = self.data_sampler.next_batch()
                 batch_z = self.z_sampler.get_batch(batch_size)
                 dv_loss, dz_loss, d_loss = self.train_disc_step(batch_z, batch_v, batch_t)
 
-            batch_v, batch_t = self.data_sampler.train(batch_size)
+            batch_v, batch_t = self.data_sampler.next_batch()
             batch_z = self.z_sampler.get_batch(batch_size)
             batch_x = np.random.normal(size=(batch_size,1)).astype('float32')
             batch_y = np.random.normal(size=(batch_size,1)).astype('float32')
@@ -471,9 +481,11 @@ class SimCausalEGM(object):
                 print(contents)
                 l2_loss_v_train, l2_loss_v_test = self.evaluate(batch_idx)
                 f_log.write('%d\t%.5f\t%.5f\n'%(batch_idx,l2_loss_v_train, l2_loss_v_test))
+
                 #ckpt_save_path = self.ckpt_manager.save()
                 #print ('Saving checkpoint for epoch {} at {}'.format(batch_idx,ckpt_save_path))
         f_log.close()
+
 
     def get_predictive_feats(self, data_t):
         data_ev0 = (data_t[:,7]+data_t[:,10])/np.sqrt(2)

@@ -1,8 +1,10 @@
 import numpy as np
+import math
 import os
 import sys
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler,MaxAbsScaler,StandardScaler
+from sklearn.model_selection import train_test_split
 
 def Dataset_selector(name):
     if 'acic' in name:
@@ -31,6 +33,23 @@ class Custom_sampler(object):
     def train(self, batch_size):
         indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
         return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
+    def load_all(self):
+        return self.data_x, self.data_y, self.data_v
+
+
+class Sim_Hirano_Imbens_sampler(object):
+    def __init__(self, v_dim=15):
+        self.data = np.loadtxt('../baselines/Imbens_sim_data.txt',usecols=range(0,17),delimiter='\t')
+        self.v_dim = v_dim
+        self.data_v = self.data[:, 0:v_dim].astype('float32')
+        self.data_x = self.data[:, v_dim].reshape(-1, 1).astype('float32')
+        self.data_y = (self.data[:, v_dim+1]).reshape(-1, 1).astype('float32')
+        self.sample_size = len(self.data_x)
+
+    def train(self, batch_size):
+        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
+        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
+
     def load_all(self):
         return self.data_x, self.data_y, self.data_v
 
@@ -114,31 +133,12 @@ class Sim_quadratic_sampler(object):
     def load_all(self):
         return self.data_x, self.data_y, self.data_v
 
-class Sim_Hirano_Imbens_sampler(object):
-    def __init__(self, N = 20000, v_dim=15, z0_dim=1, z1_dim=1, z2_dim=1):
-        self.data = np.loadtxt('../baselines/Imbens_sim_data.txt',usecols=range(0,17),delimiter='\t')
-        self.sample_size = N
-        self.v_dim = v_dim
-        self.data_v = self.data[:, 0:v_dim].astype('float32')
-        self.data_x = self.data[:, v_dim].reshape(-1, 1).astype('float32')
-        self.data_y = (self.data[:, v_dim+1]).reshape(-1, 1).astype('float32')
-        print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
-        np.savez('../baselines/data.npz',x=self.data_x, y=self.data_y, v=self.data_v)
-        np.savetxt('../baselines/data.txt', np.concatenate([self.data_x, self.data_y, self.data_v],axis=1), delimiter='\t')
-        data_pd = pd.DataFrame(np.concatenate([self.data_x, self.data_y, self.data_v],axis=1),columns=['x','y']+['v%d'%i for i in range(v_dim)])
-        data_pd.to_csv('../baselines/data.csv',sep='\t',index=False)
-
-
-    def train(self, batch_size):
-        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
-        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
-
-    def load_all(self):
-        return self.data_x, self.data_y, self.data_v
-
 class Semi_acic_sampler(object):
-    def __init__(self, N = 20000, v_dim=117, z0_dim=1, z1_dim=1, z2_dim=1,
-                path='../data/ACIC_2018', ufid='5d4cabab88b247d1b48cd38b46555b2c'):
+    def __init__(self, batch_size, path='../data/ACIC_2018', 
+                ufid='5d4cabab88b247d1b48cd38b46555b2c',val_fac=0.05, random_seed=123):
+        self.batch_size = batch_size
+        self.val_fac = val_fac
+        np.random.seed(random_seed)
         self.df_covariants = pd.read_csv('%s/x.csv'%path, index_col='sample_id',header=0, sep=',')
         self.df_sim = pd.read_csv('%s/scaling/factuals/%s.csv'%(path, ufid),index_col='sample_id',header=0, sep=',')
         dataset = self.df_covariants.join(self.df_sim, how='inner')
@@ -146,22 +146,42 @@ class Semi_acic_sampler(object):
         self.data_y = dataset['y'].values.reshape(-1,1)
         self.data_v = dataset.values[:,:-2]
         self.data_v = self.normalize(self.data_v)
-
-        self.sample_size = len(self.data_x)
-        self.v_dim = v_dim
         self.data_v = self.data_v.astype('float32')
         self.data_x = self.data_x.astype('float32')
         self.data_y = self.data_y.astype('float32')
-        print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
+        if self.val_fac >0:
+            self.data_x_trn,self.data_x_val,self.data_y_trn,self.data_y_val,\
+                    self.data_v_trn,self.data_v_val = train_test_split(self.data_x,self.data_y,self.data_v,\
+                                                            test_size=self.val_fac, random_state=123)
+        self.full_index = np.arange(len(self.data_x_trn))
+        np.random.shuffle(self.full_index)
+        self.idx_gen = self.create_idx_generator(sample_size=len(self.data_x_trn))
 
+    def create_idx_generator(self, sample_size, random_seed=123):
+        while True:
+            for step in range(math.ceil(sample_size/self.batch_size)):
+                if (step+1)*self.batch_size <= sample_size:
+                    yield self.full_index[step*self.batch_size:(step+1)*self.batch_size]
+                else:
+                    yield np.hstack([self.full_index[step*self.batch_size:],
+                                    self.full_index[:((step+1)*self.batch_size-sample_size)]])
+                    np.random.shuffle(self.full_index)
+                    
     def normalize(self, data):
         normal_scalar = StandardScaler()
         data = normal_scalar.fit_transform(data)
         return data
 
-    def train(self, batch_size):
-        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
-        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
+    def next_batch(self):
+        indx = next(self.idx_gen)
+        #indx = np.random.randint(low = 0, high = len(self.data_x), size = self.batch_size)
+        if self.val_fac == 0:
+            return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
+        else:
+            return self.data_x_trn[indx,:], self.data_y_trn[indx,:], self.data_v_trn[indx, :]
+
+    def held_out(self):
+        return self.data_x_val, self.data_y_val, self.data_v_val
 
     def load_all(self):
         return self.data_x, self.data_y, self.data_v
