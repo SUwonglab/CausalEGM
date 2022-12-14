@@ -13,7 +13,7 @@ Estimating Causal Effect by Deep Encoding Generative Modeling. CausalEGM utilize
 
 CausalEGM can be installed by
 ```shell
-pip install causalEGM
+pip install CausalEGM
 ```
 Software has been tested on a Linux (Centos 7) with Python3.9. A GPU card is recommended for accelerating the training process.
 
