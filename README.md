@@ -2,6 +2,8 @@
 
 Estimating Causal Effect by Deep Encoding Generative Modeling. CausalEGM utilizes deep generative neural newtworks for estimating the causal effect by decoupling the high-dimensional confounder into a set of different latent variables with specific dependency on treatment or potential outcome.
 
+![model](https://github.com/kimmo1019/CausalEGM/blob/main/model.jpg)
+
 ## Requirements
 
 - TensorFlow>=2.4.1
