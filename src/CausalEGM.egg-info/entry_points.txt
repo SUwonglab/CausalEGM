@@ -1,0 +1,2 @@
+[console_scripts]
+causalEGM = CausalEGM.cli:main
