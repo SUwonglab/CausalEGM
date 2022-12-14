@@ -21,21 +21,48 @@ def Dataset_selector(name):
         print('Cannot find the example data sampler: %s!'%name)
         sys.exit()
 
-class Custom_sampler(object):
-    def __init__(self, x, y, v, normalize=False):
+class Base_sampler(object):
+    def __init__(self, x, y, v, batch_size, normalize=False, random_seed=123):
         assert len(x)==len(y)==len(v)
+        np.random.seed(random_seed)
         self.data_x = x.astype('float32')
         self.data_y = y.astype('float32')
         self.data_v = v.astype('float32')
+        self.batch_size = batch_size
         if normalize:
             self.data_v = StandardScaler().fit_transform(self.data_v)
         self.sample_size = len(x)
-    def train(self, batch_size):
-        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
+        self.full_index = np.arange(self.sample_size)
+        np.random.shuffle(self.full_index)
+        self.idx_gen = self.create_idx_generator(sample_size=self.sample_size)
+        
+    def create_idx_generator(self, sample_size, random_seed=123):
+        while True:
+            for step in range(math.ceil(sample_size/self.batch_size)):
+                if (step+1)*self.batch_size <= sample_size:
+                    yield self.full_index[step*self.batch_size:(step+1)*self.batch_size]
+                else:
+                    yield np.hstack([self.full_index[step*self.batch_size:],
+                                    self.full_index[:((step+1)*self.batch_size-sample_size)]])
+                    np.random.shuffle(self.full_index)
+
+    def next_batch(self):
+        indx = next(self.idx_gen)
         return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
+    
     def load_all(self):
         return self.data_x, self.data_y, self.data_v
 
+class Semi_acic_sampler(Base_sampler):
+    def __init__(self, batch_size, path='../data/ACIC_2018', 
+                ufid='5d4cabab88b247d1b48cd38b46555b2c'):
+        self.df_covariants = pd.read_csv('%s/x.csv'%path, index_col='sample_id',header=0, sep=',')
+        self.df_sim = pd.read_csv('%s/scaling/factuals/%s.csv'%(path, ufid),index_col='sample_id',header=0, sep=',')
+        dataset = self.df_covariants.join(self.df_sim, how='inner')
+        x = dataset['z'].values.reshape(-1,1)
+        y = dataset['y'].values.reshape(-1,1)
+        v = dataset.values[:,:-2]
+        super().__init__(x,y,v,batch_size,normalize=True)
 
 class Sim_Hirano_Imbens_sampler(object):
     def __init__(self, v_dim=15):
@@ -133,58 +160,47 @@ class Sim_quadratic_sampler(object):
     def load_all(self):
         return self.data_x, self.data_y, self.data_v
 
-class Semi_acic_sampler(object):
-    def __init__(self, batch_size, path='../data/ACIC_2018', 
-                ufid='5d4cabab88b247d1b48cd38b46555b2c',val_fac=0.05, random_seed=123):
-        self.batch_size = batch_size
-        self.val_fac = val_fac
-        np.random.seed(random_seed)
-        self.df_covariants = pd.read_csv('%s/x.csv'%path, index_col='sample_id',header=0, sep=',')
-        self.df_sim = pd.read_csv('%s/scaling/factuals/%s.csv'%(path, ufid),index_col='sample_id',header=0, sep=',')
-        dataset = self.df_covariants.join(self.df_sim, how='inner')
-        self.data_x = dataset['z'].values.reshape(-1,1)
-        self.data_y = dataset['y'].values.reshape(-1,1)
-        self.data_v = dataset.values[:,:-2]
-        self.data_v = self.normalize(self.data_v)
-        self.data_v = self.data_v.astype('float32')
-        self.data_x = self.data_x.astype('float32')
-        self.data_y = self.data_y.astype('float32')
-        if self.val_fac >0:
-            self.data_x_trn,self.data_x_val,self.data_y_trn,self.data_y_val,\
-                    self.data_v_trn,self.data_v_val = train_test_split(self.data_x,self.data_y,self.data_v,\
-                                                            test_size=self.val_fac, random_state=123)
-        self.full_index = np.arange(len(self.data_x_trn))
-        np.random.shuffle(self.full_index)
-        self.idx_gen = self.create_idx_generator(sample_size=len(self.data_x_trn))
+# class Semi_acic_sampler(object):
+#     def __init__(self, batch_size, path='../data/ACIC_2018', 
+#                 ufid='5d4cabab88b247d1b48cd38b46555b2c',random_seed=123):
+#         self.batch_size = batch_size
+#         np.random.seed(random_seed)
+#         self.df_covariants = pd.read_csv('%s/x.csv'%path, index_col='sample_id',header=0, sep=',')
+#         self.df_sim = pd.read_csv('%s/scaling/factuals/%s.csv'%(path, ufid),index_col='sample_id',header=0, sep=',')
+#         dataset = self.df_covariants.join(self.df_sim, how='inner')
+#         self.data_x = dataset['z'].values.reshape(-1,1)
+#         self.data_y = dataset['y'].values.reshape(-1,1)
+#         self.data_v = dataset.values[:,:-2]
+#         self.data_v = self.normalize(self.data_v)
+#         self.data_v = self.data_v.astype('float32')
+#         self.data_x = self.data_x.astype('float32')
+#         self.data_y = self.data_y.astype('float32')
 
-    def create_idx_generator(self, sample_size, random_seed=123):
-        while True:
-            for step in range(math.ceil(sample_size/self.batch_size)):
-                if (step+1)*self.batch_size <= sample_size:
-                    yield self.full_index[step*self.batch_size:(step+1)*self.batch_size]
-                else:
-                    yield np.hstack([self.full_index[step*self.batch_size:],
-                                    self.full_index[:((step+1)*self.batch_size-sample_size)]])
-                    np.random.shuffle(self.full_index)
+#         self.full_index = np.arange(len(self.data_x))
+#         np.random.shuffle(self.full_index)
+#         self.idx_gen = self.create_idx_generator(sample_size=len(self.data_x))
+
+#     def create_idx_generator(self, sample_size, random_seed=123):
+#         while True:
+#             for step in range(math.ceil(sample_size/self.batch_size)):
+#                 if (step+1)*self.batch_size <= sample_size:
+#                     yield self.full_index[step*self.batch_size:(step+1)*self.batch_size]
+#                 else:
+#                     yield np.hstack([self.full_index[step*self.batch_size:],
+#                                     self.full_index[:((step+1)*self.batch_size-sample_size)]])
+#                     np.random.shuffle(self.full_index)
                     
-    def normalize(self, data):
-        normal_scalar = StandardScaler()
-        data = normal_scalar.fit_transform(data)
-        return data
+#     def normalize(self, data):
+#         normal_scalar = StandardScaler()
+#         data = normal_scalar.fit_transform(data)
+#         return data
 
-    def next_batch(self):
-        indx = next(self.idx_gen)
-        #indx = np.random.randint(low = 0, high = len(self.data_x), size = self.batch_size)
-        if self.val_fac == 0:
-            return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
-        else:
-            return self.data_x_trn[indx,:], self.data_y_trn[indx,:], self.data_v_trn[indx, :]
+#     def next_batch(self):
+#         indx = next(self.idx_gen)
+#         return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
 
-    def held_out(self):
-        return self.data_x_val, self.data_y_val, self.data_v_val
-
-    def load_all(self):
-        return self.data_x, self.data_y, self.data_v
+#     def load_all(self):
+#         return self.data_x, self.data_y, self.data_v
 
 class Semi_ihdp_sampler(object):
     def __init__(self, N = 20000, v_dim=25, path='../data/IHDP_100', ufid='ihdp_npci_1'):
