@@ -1,3 +1,5 @@
+<img alt="PyPI" src="https://img.shields.io/pypi/v/CausalEGM">
+
 # CausalEGM
 
 Estimating Causal Effect by Deep Encoding Generative Modeling. CausalEGM utilizes deep generative neural newtworks for estimating the causal effect by decoupling the high-dimensional confounder into a set of different latent variables with specific dependency on treatment or potential outcome.
