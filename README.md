@@ -1,4 +1,4 @@
-<img alt="PyPI" src="https://img.shields.io/pypi/v/CausalEGM">
+![PyPI](https://img.shields.io/pypi/v/CausalEGM)
 
 # CausalEGM
 
