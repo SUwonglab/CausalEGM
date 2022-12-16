@@ -1,4 +1,4 @@
-![PyPI](https://img.shields.io/pypi/v/CausalEGM)
+[![PyPI](https://img.shields.io/pypi/v/CausalEGM)](https://pypi.org/project/CausalEGM/)
 
 # CausalEGM
 
