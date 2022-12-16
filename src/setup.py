@@ -1,5 +1,8 @@
 import setuptools
 
+with open('requirements.txt') as f:
+    requirements = [l for l in f.read().splitlines() if l]
+
 setuptools.setup(
     name="CausalEGM", 
     version="0.2.2",
@@ -10,10 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/SUwonglab/CausalEGM",
     packages=setuptools.find_packages(),
-    install_requires=["tensorflow-gpu==2.8.0", 
-                "tensorflow-determinism==0.3.0", 
-                "scikit-learn", "pandas",
-                "python-dateutil"],
+    install_requires=requirements,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
