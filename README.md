@@ -36,18 +36,9 @@ Please feel free to open an issue in Github or contact `liuqiao@stanford.edu` if
 
 ## Citation
 
-If you find CausalEGM useful for your work, please consider citing our paper:
+If you find CausalEGM useful for your work, please consider citing our [paper](https://arxiv.org/abs/2212.05925):
 
 Qiao Liu, Zhongren Chen, Wing Hung Wong. CausalEGM: a general causal inference framework by encoding generative modeling[J]. arXiv preprint arXiv:2212.05925, 2022.
-
-```shell
-@article{liu2022causalegm,
-  title={CausalEGM: a general causal inference framework by encoding generative modeling},
-  author={Liu, Qiao and Chen, Zhongren and Wong, Wing Hung},
-  journal={arXiv preprint arXiv:2212.05925},
-  year={2022}
-}
-```
 
 ## License
 
