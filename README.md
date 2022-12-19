@@ -40,6 +40,15 @@ If you find CausalEGM useful for your work, please consider citing our paper:
 
 Qiao Liu, Zhongren Chen, Wing Hung Wong. CausalEGM: a general causal inference framework by encoding generative modeling[J]. arXiv preprint arXiv:2212.05925, 2022.
 
+```shell
+@article{liu2022causalegm,
+  title={CausalEGM: a general causal inference framework by encoding generative modeling},
+  author={Liu, Qiao and Chen, Zhongren and Wong, Wing Hung},
+  journal={arXiv preprint arXiv:2212.05925},
+  year={2022}
+}
+```
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details
