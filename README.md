@@ -31,7 +31,7 @@ We tested CausalEGM with simulation datasets first.
 
 ## Contact
 
-Please feel free to open an issue in Github or directly contact `liuqiao@stanford.edu` if you have any problem in Roundtrip.
+Please feel free to open an issue in Github or contact `liuqiao@stanford.edu` if you have any problem in CausalEGM.
 
 
 ## Citation
