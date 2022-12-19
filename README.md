@@ -29,3 +29,18 @@ This section provides instructions on how to reproduce results in the our paper.
 
 We tested CausalEGM with simulation datasets first. 
 
+## Contact
+
+Please feel free to open an issue in Github or directly contact `liuqiao@stanford.edu` if you have any problem in Roundtrip.
+
+
+## Citation
+
+If you find CausalEGM useful for your work, please consider citing our paper:
+
+Qiao Liu, Zhongren Chen, Wing Hung Wong. CausalEGM: a general causal inference framework by encoding generative modeling[J]. arXiv preprint arXiv:2212.05925, 2022.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details
+
