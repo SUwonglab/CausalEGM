@@ -89,3 +89,6 @@ todo_include_todos = False
 html_theme = "sphinx_rtd_theme"
 html_theme_options = dict(navigation_depth=1, titles_only=True)
 github_repo = "CausalEGM"
+
+source_suffix = [".rst", ".ipynb"]
+master_doc = "index"
