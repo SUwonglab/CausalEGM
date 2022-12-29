@@ -23,7 +23,6 @@ HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE.parent.parent))
 sys.path.insert(0, os.path.abspath("_ext"))
 
-import scvelo  # isort:skip # noqa E402
 
 # remove PyCharm’s old six module
 
@@ -37,42 +36,6 @@ if "six" in sys.modules:
 matplotlib.use("agg")
 
 logger = logging.getLogger(__name__)
-
-
-# -- Basic notebooks and those stored under /vignettes and /perspectives --
-
-notebooks_url = "https://github.com/theislab/scvelo_notebooks/raw/master/"
-notebooks = []
-notebook = [
-    "VelocityBasics.ipynb",
-    "DynamicalModeling.ipynb",
-    "DifferentialKinetics.ipynb",
-]
-notebooks.extend(notebook)
-
-notebook = [
-    "Pancreas.ipynb",
-    "DentateGyrus.ipynb",
-    "NatureBiotechCover.ipynb",
-    "Fig1_concept.ipynb",
-    "Fig2_dentategyrus.ipynb",
-    "Fig3_pancreas.ipynb",
-    "FigS9_runtime.ipynb",
-    "FigSuppl.ipynb",
-]
-notebooks.extend([f"vignettes/{nb}" for nb in notebook])
-
-notebook = ["Perspectives.ipynb", "Perspectives_parameters.ipynb"]
-notebooks.extend([f"perspectives/{nb}" for nb in notebook])
-
-# -- Retrieve all notebooks --
-
-for nb in notebooks:
-    url = notebooks_url + nb
-    try:
-        urlretrieve(url, nb)
-    except URLError as e:
-        logger.error(f"Unable to retrieve notebook: `{url}`. Reason: `{e}`")
 
 
 # -- General configuration ------------------------------------------------
@@ -91,7 +54,6 @@ extensions = [
     "sphinx_autodoc_typehints",
     "nbsphinx",
     "edit_on_github",
-    "sphinxcontrib.bibtex",
 ]
 
 
@@ -115,39 +77,21 @@ source_suffix = [".rst", ".ipynb"]
 master_doc = "index"
 
 # General information about the project.
-project = "scVelo"
-author = "Volker Bergen"
-title = "RNA Velocity generalized through dynamical modeling"
+project = "CausalEGM"
+author = "Qiao Liu"
+title = "A general causal inference framework by encoding generative modeling"
 copyright = f"{datetime.now():%Y}, {author}"
 
-version = scvelo.__version__.replace(".dirty", "")
-release = version
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 pygments_style = "sphinx"
 todo_include_todos = False
 
-# Add notebooks prolog to Google Colab and nbviewer
-nbsphinx_prolog = r"""
-{% set docname = 'github/theislab/scvelo_notebooks/blob/master/' + env.doc2path(env.docname, base=None) %}
-.. raw:: html
-
-    <div class="note">
-      <a href="https://colab.research.google.com/{{ docname|e }}" target="_parent">
-      <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
-      <a href="https://nbviewer.jupyter.org/{{ docname|e }}" target="_parent">
-      <img src="https://github.com/theislab/scvelo/raw/master/docs/source/_static/nbviewer-badge.svg" alt="Open In nbviewer"/></a>
-    </div>
-"""
-
-# bibliography
-bibtex_bibfiles = ["references.bib"]
-bibtex_reference_style = "author_year"
 
 # -- Options for HTML output ----------------------------------------------
 
 html_theme = "sphinx_rtd_theme"
 html_theme_options = dict(navigation_depth=1, titles_only=True)
-github_repo = "scvelo"
+github_repo = "CausalEGM"
 github_nb_repo = "scvelo_notebooks"
 html_static_path = ["_static"]
 
@@ -160,7 +104,7 @@ def setup(app):
 
 # -- Options for other output ------------------------------------------
 
-htmlhelp_basename = "scvelodoc"
+htmlhelp_basename = "causalegmdoc"
 title_doc = f"{project} documentation"
 
 latex_documents = [(master_doc, f"{project}.tex", title_doc, author, "manual")]
@@ -168,51 +112,6 @@ man_pages = [(master_doc, project, title_doc, [author], 1)]
 texinfo_documents = [
     (master_doc, project, title_doc, author, project, title, "Miscellaneous")
 ]
-
-
-# -- generate_options override ------------------------------------------
-
-
-# TODO: Add docstrings
-def process_generate_options(app: Sphinx):
-    """TODO."""
-    genfiles = app.config.autosummary_generate
-
-    if genfiles and not hasattr(genfiles, "__len__"):
-        env = app.builder.env
-        genfiles = [
-            env.doc2path(x, base=None)
-            for x in env.found_docs
-            if Path(env.doc2path(x)).is_file()
-        ]
-    if not genfiles:
-        return
-
-    from sphinx.ext.autosummary.generate import generate_autosummary_docs
-
-    ext = app.config.source_suffix
-    genfiles = [
-        genfile + (not genfile.endswith(tuple(ext)) and ext[0] or "")
-        for genfile in genfiles
-    ]
-
-    suffix = autosummary.get_rst_suffix(app)
-    if suffix is None:
-        return
-
-    generate_autosummary_docs(
-        genfiles,
-        builder=app.builder,
-        warn=logger.warning,
-        info=logger.info,
-        suffix=suffix,
-        base_path=app.srcdir,
-        imported_members=True,
-        app=app,
-    )
-
-
-autosummary.process_generate_options = process_generate_options
 
 
 # -- GitHub URLs for class and method pages ------------------------------------------
