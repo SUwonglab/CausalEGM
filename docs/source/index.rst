@@ -1,21 +1,23 @@
 |PyPI| |travis| |Docs|
 
-CausalEGM - A general causal inference framework by encoding generative modeling
-============================================================
 
-.. image:: https://github.com/SUwonglab/CausalEGM/blob/main/model.jpg
+
+CausalEGM - A general causal inference framework by encoding generative modeling
+================================================================================
+
+.. image:: https://raw.githubusercontent.com/SUwonglab/CausalEGM/main/model.jpg
    :width: 300px
    :align: left
 
 .. include:: _key_contributors.rst
 
-**CausalEGM** is a general causal inference framework `Liu et al. (arXiv, 2022) <https://arxiv.org/abs/2212.05925>`_ for estimating causal effects by encoding generative modeling, which can be applied in both binary and continuous treatment settings.
+**CausalEGM** is a general causal inference framework `Liu et al. (arXiv, 2022) <https://arxiv.org/pdf/2212.05925.pdf>`_ for estimating causal effects by encoding generative modeling, which can be applied in both binary and continuous treatment settings.
 
 CausalEGM simultaneously decouples the dependencies of confounders on both treatment and outcome and maps the confounders to the low-dimensional latent space. 
 By conditioning on the low-dimensional latent features, CausalEGM can estimate the causal effect for each individual or the average causal effect within a population.
 
 CausalEGM's key applications
-^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - estimate average treatment effect (ATE).
 - estimate individual treatment effect (ITE).
 - estiamte average dose response function (ADRF).
@@ -26,15 +28,15 @@ CausalEGM's key applications
 
 Latest news
 ^^^^^^^^^^^
-- Dec/2021: Preprint paper of CausalEGM is out on `arXiv <https://arxiv.org/abs/2212.05925/>`_ 
+- Dec/2021: Preprint paper of CausalEGM is out on `arXiv <https://arxiv.org/abs/2212.05925/>`__ 
 - Aug/2022: Version 0.1.0 of CausalEGM is released on `PyPI <https://pypi.org/project/epiaster/>`_ 
 
 Main References
-^^^^^^^^^^
+^^^^^^^^^^^^^^^
 Liu *et al.* (2021), Density estimation using deep generative neural networks, `PNAS <https://www.pnas.org/doi/abs/10.1073/pnas.2101344118>`_.
 
 Liu *et al.* (2022), CausalEGM: a general causal inference framework by encoding generative modeling,
-`arXiv <https://arxiv.org/abs/2212.05925>`_.
+`arXiv <https://arxiv.org/abs/2212.05925>`__.
 
 Support
 ^^^^^^^

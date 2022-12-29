@@ -1,5 +1,5 @@
 About CausalEGM
-------------
+---------------
 
 Given the observational data, drawing inferences about the causal effect of a treatment is crucial to many
 scientific and engineering problems and attracts immense interest in a wide variety of areas. The most
@@ -13,7 +13,7 @@ CausalEGM is a causal inference framework for obervational study.
 
 
 Highlighted features
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 In observational study, many frameworks have been proposed to adjust for confounding effect under the potential outcome model (`Rubin et al. 1974 <http://www.fsb.muohio.edu/lij14/420_paper_Rubin74.pdf>`_). CausalEGM explores the advances in machine learning, especially deep learning, for improving the performance in causal effect estimation. Inspired by our previous work Roundtrip (`Liu et al. 2021 <https://www.pnas.org/doi/abs/10.1073/pnas.2101344118>`_), we propose CausalEGM based on
 bidirectional deep generative neural networks to learn the latent representation of high-dimensional confounders. The independence of treatment and confounding variables conditioning on the latent representation provides a new aspect to handle the high-dimensional confounders. In brief, given the observation data with treatment X, outcome Y, covariates V, if V can be effectively encoded by Z, with unconfoundedness assumption, the population average estimate can be represented as
 

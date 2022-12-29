@@ -15,7 +15,7 @@ Further, several utilities (``scv.utils.*``) are provided to facilitate data ana
 
 
 Model initialization
------------
+--------------------
 
 .. autosummary::
    :toctree: .
@@ -23,16 +23,16 @@ Model initialization
    CausalEGM
 
 Model training and evaluation
-------------------
+-----------------------------
 
 .. autosummary::
    :toctree: .
 
-   CausalEGM.train
-   CausalEGM.evaluate
+   causalEGM.CausalEGM.train
+   causalEGM.CausalEGM.evaluate
 
 Built-in datasets sampler
-----------
+-------------------------
 
 
 .. autosummary::

@@ -1,7 +1,7 @@
 Installation
 ------------
 
-CausalEGM requires Python 3 and TensorFlow 2. We recommend to use Miniconda_ or Anoconda_.
+CausalEGM requires Python 3 and TensorFlow 2. We recommend to use Miniconda_.
 
 Install from PyPI
 ^^^^^^^^^^^^^^^^^
