@@ -31,7 +31,6 @@ if "six" in sys.modules:
             sys.path.remove(pypath)
     del sys.modules["six"]
 
-matplotlib.use("agg")
 
 logger = logging.getLogger(__name__)
 
