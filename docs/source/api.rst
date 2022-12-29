@@ -1,4 +1,3 @@
-.. automodule:: CausalEGM
 
 API
 ===
@@ -17,36 +16,3 @@ Further, several utilities (``scv.utils.*``) are provided to facilitate data ana
 Model initialization
 --------------------
 
-.. autosummary::
-   :toctree: .
-
-   CausalEGM
-
-Model training and evaluation
------------------------------
-
-.. autosummary::
-   :toctree: .
-
-   causalEGM.CausalEGM.train
-   causalEGM.CausalEGM.evaluate
-
-Built-in datasets sampler
--------------------------
-
-
-.. autosummary::
-   :toctree: .
-
-   Base_sampler
-   Semi_acic_sampler
-
-Utils
------
-
-**Load data from file**
-
-.. autosummary::
-   :toctree: .
-
-   parse_file
