@@ -52,7 +52,6 @@ Your help to improve CausalEGM is highly appreciated!
    :hidden:
 
    about
-   installation
    release_notes
 
 .. toctree::
