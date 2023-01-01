@@ -20,16 +20,20 @@ CausalEGM can be installed by
 ```shell
 pip install CausalEGM
 ```
-Software has been tested on a Linux (Centos 7) with Python3.9. A GPU card is recommended for accelerating the training process.
+
+Note that a GPU is recommended for accelerating the model training. However, GPU is not a must, CausalEGM can be installed on any personal computer (e.g, Macbook) or computational cluster.
 
 
 ## Reproduction
 
 This section provides instructions on how to reproduce results in the our paper.
 
-### Simulation data
+We provide the config files for all the datasets used in our study. These config files can be found in `configs` folder.
 
-We tested CausalEGM with simulation datasets first. 
+```shell
+cd src
+python3 main.py -c CONFIG_PATH
+```
 
 ## Contact
 
