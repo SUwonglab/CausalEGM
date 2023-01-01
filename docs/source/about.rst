@@ -24,9 +24,12 @@ bidirectional deep generative neural networks to learn the latent representation
    
 Several unique features of CausalEGM are summarized as follows:
 
+
 - CausalEGM simultaneously decouples the dependencies of confounders on treatment and outcome and apply dimension reduction to confounders
 
+
 - CausalEGM supports inferring the causal relationship given extremely large sample size (e.g, >10M)
+
 
 - CausalEGM is able to handle high-dimensional confounders (e.g, >10K)
 
