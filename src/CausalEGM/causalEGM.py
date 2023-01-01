@@ -191,7 +191,7 @@ class CausalEGM(object):
         f_params.write(str(self.params))
         f_params.close()
         if data is None and data_file is None:
-            self.data_sampler = Dataset_selector(self.params['dataset'])(batch_size=batch_size, ufid=self.params['ufid'])
+            self.data_sampler = Dataset_selector(self.params['dataset'])(batch_size=batch_size)
         elif data is not None:
             if len(data) != 3:
                 print('Data imcomplete error, please provide pair-wise (X, Y, V) in a list or tuple.')

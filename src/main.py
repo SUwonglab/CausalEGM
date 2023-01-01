@@ -10,5 +10,4 @@ if __name__=="__main__":
     with open(config, 'r') as f:
         params = yaml.load(f)
     model = CausalEGM(params,random_seed=123)
-    model.train()
-
+    model.train(n_iter=params['nb_batches'], startoff=0,batches_per_eval=params['batches_per_eval'])

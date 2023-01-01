@@ -5,18 +5,22 @@ import sys
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler,MaxAbsScaler,StandardScaler
 from sklearn.model_selection import train_test_split
+from scipy.sparse import diags
+from scipy.stats import norm
 
 def Dataset_selector(name):
-    if 'acic' in name:
+    if name == 'Semi_acic':
         return Semi_acic_sampler
-    elif 'ihdp' in name:
+    elif name=='Semi_ihdp':
         return Semi_ihdp_sampler
-    elif 'Hirano' in name:
+    elif name=='Sim_Hirano_Imbens':
         return Sim_Hirano_Imbens_sampler
-    elif 'quadratic' in name:
-        return Sim_quadratic_sampler
-    elif 'linear' in name:
-        return Sim_linear_sampler
+    elif name=='Sim_Sun':
+        return Sim_Sun_sampler
+    elif name=='Sim_Colangelo':
+        return Sim_Colangelo_sampler
+    elif name=='Semi_Twins':
+        return Semi_Twins_sampler
     else:
         print('Cannot find the example data sampler: %s!'%name)
         sys.exit()
@@ -64,163 +68,84 @@ class Semi_acic_sampler(Base_sampler):
         v = dataset.values[:,:-2]
         super().__init__(x,y,v,batch_size,normalize=True)
 
-class Sim_Hirano_Imbens_sampler(object):
-    def __init__(self, v_dim=15):
-        self.data = np.loadtxt('../baselines/Imbens_sim_data.txt',usecols=range(0,17),delimiter='\t')
-        self.v_dim = v_dim
-        self.data_v = self.data[:, 0:v_dim].astype('float32')
-        self.data_x = self.data[:, v_dim].reshape(-1, 1).astype('float32')
-        self.data_y = (self.data[:, v_dim+1]).reshape(-1, 1).astype('float32')
-        self.sample_size = len(self.data_x)
+class Sim_Hirano_Imbens_sampler(Base_sampler):
+    def __init__(self, batch_size, N=20000, v_dim=200, seed=0):
+        np.random.seed(seed)
+        v = np.random.exponential(scale=1.0, size=(N, v_dim))
+        rate = v[:,0] + v[:,1]
+        scale = 1/rate
+        x = np.random.exponential(scale=scale)
+        y = np.random.normal(x + (v[:,0] + v[:,2]) * np.exp(-x * (v[:,0] + v[:,2])) , 1)
+        x = x.reshape(-1,1)
+        y = y.reshape(-1,1)
+        super().__init__(x,y,v,batch_size,normalize=True)
 
-    def train(self, batch_size):
-        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
-        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
+class Sim_Sun_sampler(Base_sampler):
+    def __init__(self, batch_size, N=20000, v_dim=200, seed=0):
+        np.random.seed(seed)
+        v = np.random.normal(0, 1, size=(N, v_dim))        
+        x = np.random.normal(-2*(np.sin(2*v[:,0]))+ ((v[:,1])**2 - 1/3) + (v[:,2]-1/2) + np.cos(v[:,3]), 1)
+        y = np.random.normal(((v[:,0] - 1/2)+ np.cos(v[:,1]) + (v[:,4])**2 + (v[:,5])) + x, 1)       
+        x = x.reshape(-1,1)
+        y = y.reshape(-1,1)
+        super().__init__(x,y,v,batch_size,normalize=True)
 
-    def load_all(self):
-        return self.data_x, self.data_y, self.data_v
+class Sim_Colangelo_sampler(Base_sampler):
+    def __init__(self, batch_size, N=1000, v_dim=100, seed=0,
+                rho=0.5,offset = [-1,0,1]):
+        np.random.seed(seed)
+        k = np.array([rho*np.ones(v_dim-1),np.ones(v_dim),rho*np.ones(v_dim-1)])
+        sigma = diags(k,offset).toarray()
+        theta = np.array([(1/(l**2)) for l in list(range(1,(v_dim+1)))])
+        epsilon = np.random.normal(0,1,N)
+        nu = np.random.normal(0,1,N)
+        v = np.random.multivariate_normal(np.zeros(v_dim),sigma,size=[N,])
+        x = norm.cdf((3*v@theta)) + 0.75*nu - 0.5
+        y = 1.2*x + (x**2) + (x*v[:,0]) + 1.2*(v@theta) + epsilon  
+        x = x.reshape(-1,1)
+        y = y.reshape(-1,1)
+        super().__init__(x,y,v,batch_size,normalize=True)
 
-class Sim_linear_sampler(object):
-    def __init__(self, N = 20000, v_dim=10, z0_dim=1, z1_dim=2, z2_dim=2, z3_dim=5, ax = 1, bx = 1):
-        np.random.seed(123)
-        self.sample_size = N
-        self.v_dim = v_dim
-        self.z0_dim = z0_dim
-        self.z1_dim = z1_dim
-        self.z2_dim = z2_dim
-        self.z3_dim = z3_dim
-        self.ax = ax
-        self.bx = bx
-        self.alpha = np.ones(((z0_dim+z1_dim),1))
-        self.beta_1 = np.ones((z0_dim,1)) 
-        self.beta_2 = np.ones((z2_dim,1)) 
-        self.data_v = np.random.normal(0, 1, size=(N, v_dim))
-        self.data_x = self.get_value_x(self.data_v)
-        self.data_y = self.get_value_y(self.data_v, self.data_x)
-        self.data_x = self.data_x.astype('float32')
-        self.data_y = self.data_y.astype('float32')
-        self.data_v = self.data_v.astype('float32')
-        print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
-        print(np.max(self.data_x),np.max(self.data_y), np.max(self.data_v)) #8.036544 242.13437 4.350001
-        print(np.min(self.data_x),np.min(self.data_y), np.min(self.data_v)) #-7.866399 -261.7619 -4.60713
+class Semi_Twins_sampler(Base_sampler):
+    def __init__(self, batch_size, seed=0,
+                path='../data/Twins'):
+        covariate_df = pd.read_csv('%s/twin_pairs_X_3years_samesex.csv'%path).iloc[:,2:].drop(['infant_id_0', 'infant_id_1'], axis=1)
+        treatment_df_ = pd.read_csv('%s/twin_pairs_T_3years_samesex.csv'%path).iloc[:,1:]
+        outcome_df = pd.read_csv('%s/twin_pairs_Y_3years_samesex.csv'%path).iloc[:,1:]
+        #### discard NAN values
+        rows_with_nan = [index for index, row in covariate_df.iterrows() if row.isnull().any()]
+        covariate_df = covariate_df.drop(rows_with_nan)
+        treatment_df_ = treatment_df_.drop(rows_with_nan)
+        outcome_df = outcome_df.drop(rows_with_nan)
+        #### select those below 2kg:
+        rows_less2kg = [index for index, row in treatment_df_.iterrows() if (row['dbirwt_1']>=2000)]
+        covariate_df = covariate_df.drop(rows_less2kg)
+        treatment_df_ = treatment_df_.drop(rows_less2kg)
+        outcome_df = outcome_df.drop(rows_less2kg)
 
-    def train(self, batch_size):
-        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
-        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
-    
-    #get x given v(or z1)
-    def get_value_x(self, v):
-        return np.random.normal(np.dot(v[:,:(self.z0_dim + self.z1_dim)],self.alpha), 1)
-
-    #get y given x and v(or z1)
-    def get_value_y(self, v, x):
-        return np.random.normal(self.bx * x + self.ax* x**2 * (np.dot(v[:,:self.z0_dim], self.beta_1) + \
-        np.dot(v[:,(self.z0_dim+self.z1_dim):(self.z0_dim+self.z1_dim+self.z2_dim)], self.beta_2)) , 1)
-
-    def load_all(self):
-        return self.data_x, self.data_y, self.data_v
-
-class Sim_quadratic_sampler(object):
-    def __init__(self, N = 20000, v_dim=25, z0_dim=3, z1_dim=3, z2_dim=3, z3_dim=3, ax = 1, bx = 1):
-        np.random.seed(123)
-        self.sample_size = N
-        self.v_dim = v_dim
-        self.z0_dim = z0_dim
-        self.z1_dim = z1_dim
-        self.z2_dim = z2_dim
-        self.z3_dim = z3_dim
-        self.ax = ax
-        self.bx = bx
-        self.alpha = np.ones(((z0_dim+z1_dim),1))
-        self.beta_1 = np.ones((z0_dim,1)) 
-        self.beta_2 = np.ones((z2_dim,1)) 
-        self.data_v = np.random.normal(0, 1, size=(N, v_dim))
-        self.data_x = self.get_value_x(self.data_v)
-        self.data_y = self.get_value_y(self.data_v, self.data_x)
-        self.data_x = self.data_x.astype('float32')
-        self.data_y = self.data_y.astype('float32')
-        self.data_v = self.data_v.astype('float32')
-        print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
-        print(np.max(self.data_x),np.max(self.data_y), np.max(self.data_v))#10.559797 156.67995 4.350001
-        print(np.min(self.data_x),np.min(self.data_y), np.min(self.data_v))#-10.261807 -9.006005 -4.60713
-
-    def train(self, batch_size):
-        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
-        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
-    
-    #get x given v(or z1)
-    def get_value_x(self, v):
-        return np.random.normal(np.dot(v[:,:(self.z0_dim + self.z1_dim)],self.alpha), 0.1)
-
-    #get y given x and v(or z1)
-    def get_value_y(self, v, x):
-        return np.random.normal(self.bx * x**2 + self.ax* x * (np.dot(v[:,:self.z0_dim], self.beta_1) + \
-        np.dot(v[:,(self.z0_dim+self.z1_dim):(self.z0_dim+self.z1_dim+self.z2_dim)], self.beta_2)) , 0.1)
-
-    def load_all(self):
-        return self.data_x, self.data_y, self.data_v
-
-# class Semi_acic_sampler(object):
-#     def __init__(self, batch_size, path='../data/ACIC_2018', 
-#                 ufid='5d4cabab88b247d1b48cd38b46555b2c',random_seed=123):
-#         self.batch_size = batch_size
-#         np.random.seed(random_seed)
-#         self.df_covariants = pd.read_csv('%s/x.csv'%path, index_col='sample_id',header=0, sep=',')
-#         self.df_sim = pd.read_csv('%s/scaling/factuals/%s.csv'%(path, ufid),index_col='sample_id',header=0, sep=',')
-#         dataset = self.df_covariants.join(self.df_sim, how='inner')
-#         self.data_x = dataset['z'].values.reshape(-1,1)
-#         self.data_y = dataset['y'].values.reshape(-1,1)
-#         self.data_v = dataset.values[:,:-2]
-#         self.data_v = self.normalize(self.data_v)
-#         self.data_v = self.data_v.astype('float32')
-#         self.data_x = self.data_x.astype('float32')
-#         self.data_y = self.data_y.astype('float32')
-
-#         self.full_index = np.arange(len(self.data_x))
-#         np.random.shuffle(self.full_index)
-#         self.idx_gen = self.create_idx_generator(sample_size=len(self.data_x))
-
-#     def create_idx_generator(self, sample_size, random_seed=123):
-#         while True:
-#             for step in range(math.ceil(sample_size/self.batch_size)):
-#                 if (step+1)*self.batch_size <= sample_size:
-#                     yield self.full_index[step*self.batch_size:(step+1)*self.batch_size]
-#                 else:
-#                     yield np.hstack([self.full_index[step*self.batch_size:],
-#                                     self.full_index[:((step+1)*self.batch_size-sample_size)]])
-#                     np.random.shuffle(self.full_index)
-                    
-#     def normalize(self, data):
-#         normal_scalar = StandardScaler()
-#         data = normal_scalar.fit_transform(data)
-#         return data
-
-#     def next_batch(self):
-#         indx = next(self.idx_gen)
-#         return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
-
-#     def load_all(self):
-#         return self.data_x, self.data_y, self.data_v
+        x = np.concatenate([treatment_df_.values[:,0], treatment_df_.values[:,1]])/1000
+        v =  np.concatenate([covariate_df.values, covariate_df.values])
+        np.random.seed(seed)
+        eps = np.random.normal(0, 0.25, size=(v.shape[0],))
+        gamma = np.random.normal(0, 0.025, size=(v.shape[1],))
+        y = -2 * 1/(1 + np.exp(-3 * x)) + np.dot(v, gamma) + eps
+        auxiliary_constant =  np.mean(np.dot(v, gamma))
+        x = x.reshape(-1,1)
+        y = y.reshape(-1,1)
+        super().__init__(x,y,v,batch_size,normalize=True)
 
 class Semi_ihdp_sampler(object):
     def __init__(self, N = 20000, v_dim=25, path='../data/IHDP_100', ufid='ihdp_npci_1'):
         self.data_all = np.loadtxt('%s/%s.csv'%(path, ufid), delimiter=',')
-        self.data_x = self.data_all[:,0].reshape(-1,1)
-        self.data_v = self.data_all[:,5:]
-        self.data_y = self.data_all[:,1].reshape(-1,1)
-        self.sample_size = len(self.data_x)
+        x = self.data_all[:,0].reshape(-1,1)
+        v = self.data_all[:,5:]
+        y = self.data_all[:,1].reshape(-1,1)
+        self.sample_size = len(x)
         self.v_dim = v_dim
-        self.data_v = self.data_v.astype('float32')
-        self.data_x = self.data_x.astype('float32')
-        self.data_y = self.data_y.astype('float32')
-        print(self.data_x.shape,self.data_y.shape,self.data_v.shape)
-
-    def train(self, batch_size):
-        indx = np.random.randint(low = 0, high = self.sample_size, size = batch_size)
-        return self.data_x[indx,:], self.data_y[indx,:], self.data_v[indx, :]
-
-    def load_all(self):
-        return self.data_x, self.data_y, self.data_v
+        v = v.astype('float32')
+        x = x.astype('float32')
+        y = y.astype('float32')
+        super().__init__(x,y,v,batch_size,normalize=True)
 
 
 class Gaussian_sampler(object):
