@@ -11,7 +11,7 @@ CausalEGM - A general causal inference framework by encoding generative modeling
 
 CausalEGM simultaneously decouples the dependencies of confounders on both treatment and outcome and maps the confounders to the low-dimensional latent space. By conditioning on the low-dimensional latent features, CausalEGM can estimate the causal effect for each individual or the average causal effect within a population.
 
-CausalEGM was developed with Python and TensorFlow, we provide console program to run CausalEGM directly without running Python script. For more information, checkout the document [here](https://causalegm.readthedocs.io/).
+CausalEGM was developed with Python and TensorFlow, we provide console program to run CausalEGM directly without running Python script. For more information, **checkout the document [here](https://causalegm.readthedocs.io/)**.
 
 Note that a GPU is recommended for accelerating the model training. However, GPU is not a must, CausalEGM can be installed on any personal computer (e.g, Macbook) or computational cluster with CPU only.
 
@@ -24,5 +24,5 @@ Qiao Liu, Zhongren Chen, Wing Hung Wong. CausalEGM: a general causal inference f
 
 ## Support
 
-Found a bug or would like to see a feature implemented? Feel free to submit an [issue](https://github.com/SUwonglab/CausalEGM/issues/new/choose). Have a question or would like to start a new discussion? You can also always send us an [email](liuqiao@stanford.edu). Your help to improve CausalEGM is highly appreciated! For further information visit [https://causalegm.readthedocs.io/](https://causalegm.readthedocs.io/).
+Found a bug or would like to see a feature implemented? Feel free to submit an [issue](https://github.com/SUwonglab/CausalEGM/issues/new/choose). Have a question or would like to start a new discussion? You can also always send us an [e-mail](mailto:liuqiao@stanford.edu?subject=[GitHub]%20CausalEGM%20project). Your help to improve CausalEGM is highly appreciated! For further information visit [https://causalegm.readthedocs.io/](https://causalegm.readthedocs.io/).
 
