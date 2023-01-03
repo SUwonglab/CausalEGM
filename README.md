@@ -11,7 +11,7 @@ CausalEGM - A general causal inference framework by encoding generative modeling
 
 CausalEGM simultaneously decouples the dependencies of confounders on both treatment and outcome and maps the confounders to the low-dimensional latent space. By conditioning on the low-dimensional latent features, CausalEGM can estimate the causal effect for each individual or the average causal effect within a population.
 
-CausalEGM was developed with Python and TensorFlow, we provide a **console program** to run CausalEGM directly without running any Python script. For more information, checkout the **Document [here](https://causalegm.readthedocs.io/)**.
+CausalEGM was developed with Python and TensorFlow, we provide a console program to run CausalEGM directly without running any Python script. For more information, checkout the **Document [here](https://causalegm.readthedocs.io/)**.
 
 Note that a GPU is recommended for accelerating the model training. However, GPU is not a must, CausalEGM can be installed on any personal computer (e.g, Macbook) or computational cluster with CPU only.
 
