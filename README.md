@@ -5,21 +5,7 @@
 CausalEGM - A general causal inference framework by encoding generative modeling
 ================================================================================
 
-
-.. raw:: html
-
-    <a href="https://scvelo.org">
-    <img src="https://github.com/SUwonglab/CausalEGM/blob/main/model.jpg" width="400px" align="left">
-    </a>
-
-.. |br| raw:: html
-
-  <br/>
-
-.. |dim| raw:: html
-
-   <span class="__dimensions_badge_embed__" data-id="pub.1129830274" data-style="small_rectangle"></span>
-   <script async src="https://badge.dimensions.ai/badge.js" charset="utf-8"></script>
+![](https://github.com/SUwonglab/CausalEGM/blob/main/model.jpg | width=100)
    
 **CausalEGM** is a general causal inference framework for estimating causal effects by encoding generative modeling, which can be applied in both binary and continuous treatment settings.. CausalEGM utilizes deep generative neural newtworks for estimating the causal effect by decoupling the high-dimensional confounder into a set of different latent variables with specific dependency on treatment or potential outcome.
 
