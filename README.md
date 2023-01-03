@@ -11,6 +11,8 @@ CausalEGM - A general causal inference framework by encoding generative modeling
 
 CausalEGM simultaneously decouples the dependencies of confounders on both treatment and outcome and maps the confounders to the low-dimensional latent space. By conditioning on the low-dimensional latent features, CausalEGM can estimate the causal effect for each individual or the average causal effect within a population.
 
+CausalEGM was developed with Python, we provide console program to run CausalEGM directly without running Python script. For more information, checkout the document ![here](https://causalegm.readthedocs.io/).
+
 
 
 ## Requirements
