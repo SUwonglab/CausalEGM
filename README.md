@@ -11,48 +11,18 @@ CausalEGM - A general causal inference framework by encoding generative modeling
 
 CausalEGM simultaneously decouples the dependencies of confounders on both treatment and outcome and maps the confounders to the low-dimensional latent space. By conditioning on the low-dimensional latent features, CausalEGM can estimate the causal effect for each individual or the average causal effect within a population.
 
-CausalEGM was developed with Python, we provide console program to run CausalEGM directly without running Python script. For more information, checkout the document [here](https://causalegm.readthedocs.io/).
+CausalEGM was developed with Python and TensorFlow, we provide console program to run CausalEGM directly without running Python script. For more information, checkout the document [here](https://causalegm.readthedocs.io/).
+
+Note that a GPU is recommended for accelerating the model training. However, GPU is not a must, CausalEGM can be installed on any personal computer (e.g, Macbook) or computational cluster with CPU only.
 
 
-
-## Requirements
-
-- TensorFlow>=2.4.1
-- Python>=3.6.1
-
-## Install
-
-CausalEGM can be installed by
-```shell
-pip install CausalEGM
-```
-
-Note that a GPU is recommended for accelerating the model training. However, GPU is not a must, CausalEGM can be installed on any personal computer (e.g, Macbook) or computational cluster.
-
-
-## Reproduction
-
-This section provides instructions on how to reproduce results in the our paper.
-
-We provide the config files for all the datasets used in our study. These config files can be found in `configs` folder.
-
-```shell
-cd src
-python3 main.py -c CONFIG_PATH
-```
-
-## Contact
-
-Please feel free to open an issue in Github or contact `liuqiao@stanford.edu` if you have any problem in CausalEGM.
-
-
-## Citation
+## Main Reference
 
 If you find CausalEGM useful for your work, please consider citing our [paper](https://arxiv.org/abs/2212.05925):
 
 Qiao Liu, Zhongren Chen, Wing Hung Wong. CausalEGM: a general causal inference framework by encoding generative modeling[J]. arXiv preprint arXiv:2212.05925, 2022.
 
-## License
+## Support
 
-This project is licensed under the MIT License - see the LICENSE.md file for details
+Found a bug or would like to see a feature implemented? Feel free to submit an [issue](https://github.com/SUwonglab/CausalEGM/issues/new/choose). Have a question or would like to start a new discussion? You can also always send us an [email](liuqiao@stanford.edu). Your help to improve CausalEGM is highly appreciated! For further information visit [https://causalegm.readthedocs.io/](https://causalegm.readthedocs.io/).
 
