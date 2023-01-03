@@ -7,9 +7,10 @@ CausalEGM - A general causal inference framework by encoding generative modeling
 
 <img align="left" src="https://github.com/SUwonglab/CausalEGM/blob/main/model.jpg" width="350">
    
-**CausalEGM** is a general causal inference framework for estimating causal effects by encoding generative modeling, which can be applied in both discrete and continuous treatment settings. 
+**CausalEGM** is a general causal inference framework `Liu et al. (arXiv, 2022) <https://arxiv.org/pdf/2212.05925.pdf>`_ for estimating causal effects by encoding generative modeling, which can be applied in both discrete and continuous treatment settings. 
 
 CausalEGM simultaneously decouples the dependencies of confounders on both treatment and outcome and maps the confounders to the low-dimensional latent space. By conditioning on the low-dimensional latent features, CausalEGM can estimate the causal effect for each individual or the average causal effect within a population.
+
 
 
 ## Requirements
