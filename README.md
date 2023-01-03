@@ -15,6 +15,19 @@ CausalEGM was developed with Python and TensorFlow, we provide a console program
 
 Note that a GPU is recommended for accelerating the model training. However, GPU is not a must, CausalEGM can be installed on any personal computer (e.g, Macbook) or computational cluster with CPU only.
 
+## Key Applications
+
+- Estimate average treatment effect (ATE).
+- Estimate individual treatment effect (ITE).
+- Estiamte average dose response function (ADRF).
+- Estimate heterogenous treatment effect (HTE).
+- Built-in simulation and semi-simulation datasets.
+
+## Latest News
+
+- Dec/2021: Preprint paper of CausalEGM is out on [arXiv](https://arxiv.org/abs/2212.05925/)
+
+- Aug/2022: Version 0.1.0 of CausalEGM is released on [PyPI](https://pypi.org/project/epiaster/)
 
 ## Main Reference
 
