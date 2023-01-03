@@ -37,7 +37,7 @@ python3 main.py -c CONFIG_PATH
 
 ## Contact
 
-Please feel free to open an issue in Github or contact `liuqiao@stanford.edu` if you have any problem in CausalEGM.
+Please feel free to open an issue in GitHub or contact `liuqiao@stanford.edu` if you have any problem in CausalEGM.
 
 
 ## Citation
