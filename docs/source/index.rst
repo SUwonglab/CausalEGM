@@ -22,7 +22,6 @@ CausalEGM's key applications
 - estimate individual treatment effect (ITE).
 - estiamte average dose response function (ADRF).
 - estimate heterogenous treatment effect (HTE).
-- estimate reaction rates of transcription, splicing and degradation.
 - built-in simulation and semi-simulation datasets.
 
 
