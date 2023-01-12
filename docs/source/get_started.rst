@@ -19,7 +19,7 @@ one can get the instuctions for running CausalEGM directly in a Linux/Unix termi
 Then the instructions for all arguments will be printed. Most of the parameters have default values.
 
 
-Use CausalEGM API
+Use CausalEGM Python API
 ^^^^^^^^^^^^^^^^^
 
 Model initialization
@@ -39,3 +39,34 @@ Model training
 Model training using::
 
     model.train(data, batch_size=32)
+
+Use CausalEGM R API
+^^^^^^^^^^^^^^^^^
+
+Import CausalEGM into a R enviornment
+''''''''''''''''''''
+
+Import CausalEGM as::
+
+    library(reticulate)
+    cegm <- import("CausalEGM")
+    np <- import("numpy")
+    
+Run CausalEGM using exmaple data as::
+
+    n <- 10000
+    p <- 10
+    v <- matrix(rnorm(n * p), n, p)
+    x <- rbinom(n, 1, 0.4 + 0.2 * (x[, 1] > 0))
+    y <- pmax(v[, 1], 0) * x + v[, 2] + pmin(v[, 3], 0) + rnorm(n)
+    x <- np$array(x)
+    y <- np$array(y)
+    v <- np$array(v)
+    model <- cegm$CausalEGM(params,random_seed=123)
+    
+Model training
+''''''''''''''
+
+Model training using::
+
+    model$train([x ,y, v])
