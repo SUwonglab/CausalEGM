@@ -231,10 +231,9 @@ class CausalEGM(object):
                     if self.params['save_model']:
                         ckpt_save_path = self.ckpt_manager.save(batch_idx)
                         #print('Saving checkpoint for iteration {} at {}'.format(batch_idx, ckpt_save_path))
-
-        if self.params['save_model']:
-            #print('Restoring the best checkpoint at iteration {}'.format(self.best_batch_idx))
-            self.ckpt.restore(self.ckpt_manager.latest_checkpoint)
+            if batch_idx % 10000 == 0:
+                np.save('{}/causal_pre_best_{}.npy'.format(self.save_dir,batch_idx), self.best_causal_pre)
+        np.save('{}/causal_pre_best.npy'.format(self.save_dir), self.best_causal_pre)
 
         if self.params['binary_treatment']:
             self.ATE = np.mean(self.best_causal_pre)
