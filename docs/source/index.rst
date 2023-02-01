@@ -27,7 +27,8 @@ CausalEGM's key applications
 
 Latest news
 ^^^^^^^^^^^
-- Dec/2021: Preprint paper of CausalEGM is out on `arXiv <https://arxiv.org/abs/2212.05925/>`__ 
+- Jan/2023: CausalEGM is now supporting API calling with R language.
+- Dec/2022: Preprint paper of CausalEGM is out on `arXiv <https://arxiv.org/abs/2212.05925/>`__ 
 - Aug/2022: Version 0.1.0 of CausalEGM is released on `PyPI <https://pypi.org/project/epiaster/>`_ 
 
 Main References
