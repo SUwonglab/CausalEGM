@@ -59,7 +59,7 @@ class Base_sampler(object):
 
 class Semi_acic_sampler(Base_sampler):
     def __init__(self, batch_size, path='../data/ACIC_2018', 
-                ufid='5d4cabab88b247d1b48cd38b46555b2c'):
+                ufid='d5bd8e4814904c58a79d7cdcd7c2a1bb'):
         self.df_covariants = pd.read_csv('%s/x.csv'%path, index_col='sample_id',header=0, sep=',')
         self.df_sim = pd.read_csv('%s/scaling/factuals/%s.csv'%(path, ufid),index_col='sample_id',header=0, sep=',')
         dataset = self.df_covariants.join(self.df_sim, how='inner')
