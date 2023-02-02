@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: CausalEGM
-Version: 0.2.2
+Version: 0.2.4
 Summary: CausalEGM: a general causal inference framework by encoding generative modeling
 Home-page: https://github.com/SUwonglab/CausalEGM
 Author: Qiao Liu
