@@ -4,7 +4,7 @@ import numpy as np
 from .util import *
 import dateutil.tz
 import datetime
-import os
+import os, sys
 
 class CausalEGM(object):
     """ CausalEGM model for causal inference.
@@ -186,12 +186,13 @@ class CausalEGM(object):
         return dv_loss, dz_loss, d_loss
 
     def train(self, data=None, data_file=None, sep='\t', header=0, normalize=False,
-            batch_size=32, n_iter=50000, batches_per_eval=500, startoff=30000, save=True, verbose=1):
+            batch_size=32, n_iter=30000, batches_per_eval=500, batches_per_save=10000,
+            startoff=0, verbose=1, save_format='txt'):
         f_params = open('{}/params.txt'.format(self.save_dir),'w')
         f_params.write(str(self.params))
         f_params.close()
         if data is None and data_file is None:
-            self.data_sampler = Dataset_selector(self.params['dataset'])(batch_size=batch_size, ufid=self.params['ufid'])
+            self.data_sampler = Dataset_selector(self.params['dataset'])(batch_size=batch_size)
         elif data is not None:
             if len(data) != 3:
                 print('Data imcomplete error, please provide pair-wise (X, Y, V) in a list or tuple.')
@@ -222,8 +223,6 @@ class CausalEGM(object):
                 if verbose:
                     print(loss_contents)
                 causal_pre, mse_x, mse_y = self.evaluate(self.data_sampler.load_all())
-                if save:
-                    np.save('{}/causal_pre_at_{}.npy'.format(self.save_dir, batch_idx), causal_pre)
                 if batch_idx >= startoff and mse_y < best_loss:
                     best_loss = mse_y
                     self.best_causal_pre = causal_pre
@@ -231,10 +230,9 @@ class CausalEGM(object):
                     if self.params['save_model']:
                         ckpt_save_path = self.ckpt_manager.save(batch_idx)
                         #print('Saving checkpoint for iteration {} at {}'.format(batch_idx, ckpt_save_path))
-
-        if self.params['save_model']:
-            #print('Restoring the best checkpoint at iteration {}'.format(self.best_batch_idx))
-            self.ckpt.restore(self.ckpt_manager.latest_checkpoint)
+                if batch_idx > 0 and batch_idx % batches_per_save == 0:
+                    self.save('{}/causal_pre_at_{}.{}'.format(self.save_dir, batch_idx, save_format), self.best_causal_pre)
+        self.save('{}/causal_pre_final.{}'.format(self.save_dir,save_format), self.best_causal_pre)
 
         if self.params['binary_treatment']:
             self.ATE = np.mean(self.best_causal_pre)
@@ -243,22 +241,28 @@ class CausalEGM(object):
     def evaluate(self, data, nb_intervals=200):
         data_x, data_y, data_v = data
         data_z = self.z_sampler.get_batch(len(data_x))
-        data_v_ = self.g_net(data_z)
-        data_z_ = self.e_net(data_v)
+        data_v_ = self.g_net.predict(data_z,verbose=0)
+        data_z_ = self.e_net.predict(data_v,verbose=0)
+        #data_v_ = self.g_net(data_z)
+        #data_z_ = self.e_net(data_v)
         data_z0 = data_z_[:,:self.params['z_dims'][0]]
         data_z1 = data_z_[:,self.params['z_dims'][0]:sum(self.params['z_dims'][:2])]
         data_z2 = data_z_[:,sum(self.params['z_dims'][:2]):sum(self.params['z_dims'][:3])]
         data_z3 = data_z_[:-self.params['z_dims'][3]:]
-        data_y_pred = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
-        data_x_pred = self.h_net(tf.concat([data_z0, data_z1], axis=-1))
+        data_y_pred = self.f_net.predict(tf.concat([data_z0, data_z2, data_x], axis=-1),verbose=0)
+        data_x_pred = self.h_net.predict(tf.concat([data_z0, data_z1], axis=-1),verbose=0)
+        #data_y_pred = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
+        #data_x_pred = self.h_net(tf.concat([data_z0, data_z1], axis=-1))
         if self.params['binary_treatment']:
             data_x_pred = tf.sigmoid(data_x_pred)
         mse_x = np.mean((data_x-data_x_pred)**2)
         mse_y = np.mean((data_y-data_y_pred)**2)
         if self.params['binary_treatment']:
             #individual treatment effect (ITE) && average treatment effect (ATE)
-            y_pred_pos = self.f_net(tf.concat([data_z0, data_z2, np.ones((len(data_x),1))], axis=-1))
-            y_pred_neg = self.f_net(tf.concat([data_z0, data_z2, np.zeros((len(data_x),1))], axis=-1))
+            y_pred_pos = self.f_net.predict(tf.concat([data_z0, data_z2, np.ones((len(data_x),1))], axis=-1),verbose=0)
+            y_pred_neg = self.f_net.predict(tf.concat([data_z0, data_z2, np.zeros((len(data_x),1))], axis=-1),verbose=0)
+            #y_pred_pos = self.f_net(tf.concat([data_z0, data_z2, np.ones((len(data_x),1))], axis=-1))
+            #y_pred_neg = self.f_net(tf.concat([data_z0, data_z2, np.zeros((len(data_x),1))], axis=-1))
             ite_pre = y_pred_pos-y_pred_neg
             return ite_pre, mse_x, mse_y
         else:
@@ -266,6 +270,17 @@ class CausalEGM(object):
             dose_response = []
             for x in np.linspace(self.params['x_min'], self.params['x_max'], nb_intervals):
                 data_x = np.tile(x, (len(data_x), 1))
-                y_pred = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
+                y_pred = self.f_net.predict(tf.concat([data_z0, data_z2, data_x], axis=-1),verbose=0)
+                #y_pred = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
                 dose_response.append(np.mean(y_pred))
             return np.array(dose_response), mse_x, mse_y
+
+    def save(self, fname, data):
+        if fname[-3:] == 'npy':
+            np.save(fname, data)
+        elif fname[-3:] == 'txt' or 'csv':
+            np.savetxt(fname, data, fmt='%.6f')
+        else:
+            print('Wrong saving format, please specify either .npy, .txt, or .csv')
+            sys.exit()
+

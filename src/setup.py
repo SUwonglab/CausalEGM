@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name="CausalEGM", 
-    version="0.2.2",
+    version="0.2.4",
     author="Qiao Liu",
     author_email="liuqiao@stanford.edu",
     description="CausalEGM: a general causal inference framework by encoding generative modeling",

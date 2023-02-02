@@ -3,6 +3,7 @@ from .util import *
 import argparse
 from CausalEGM import __version__
 
+
 def main(args=None):
 
     parser = argparse.ArgumentParser('causalEGM',
@@ -19,19 +20,19 @@ def main(args=None):
                         help="whether use binary treatment setting.")
 
     #model hypterparameters
-    parser.add_argument('-z_dims', dest='z_dims', type=int, nargs='+', default=[10,3,3,4],
+    parser.add_argument('-z_dims', dest='z_dims', type=int, nargs='+', default=[3,3,6,6],
                         help='Latent dimensions of the four encoder outputs e(V)_0~3.')
     parser.add_argument('-lr', dest='lr', type=float, default=0.0002,
                         help="Learning rate for the optimizer (default: 0.0002).")
-    parser.add_argument('-alpha', dest='alpha', type=float, default=10.,
+    parser.add_argument('-alpha', dest='alpha', type=float, default=1.,
                         help="Coefficient for reconstruction loss (default: 10).")
-    parser.add_argument('-beta', dest='beta', type=float, default=10.,
+    parser.add_argument('-beta', dest='beta', type=float, default=1.,
                         help="Coefficient for roundtrip loss (default: 10).")
     parser.add_argument('-gamma', dest='gamma', type=float, default=10.,
                         help="Coefficient for gradient penalty loss (default: 10).")
     parser.add_argument('-g_d_freq', dest='g_d_freq', type=int, default=5,
                         help="Frequency for updating discriminators and generators (default: 5).")
-    #network hyperparameters          
+    #network hyperparameters
     parser.add_argument('-g_units', dest='g_units', type=int, nargs='+', default=[64,64,64,64,64],
                         help='Number of units for generator/decoder network (default: [64,64,64,64,64]).')
     parser.add_argument('-e_units', dest='e_units', type=int, nargs='+', default=[64,64,64,64,64],
@@ -51,14 +52,14 @@ def main(args=None):
     #training parameters
     parser.add_argument('-batch_size', dest='batch_size', type=int,
                         default=32, help='Batch size (default: 32).')
-    parser.add_argument('-n_iter', dest='n_iter', type=int, default=50000,
-                        help="Number of iterations (default: 50000).")
-    parser.add_argument('-startoff', dest='startoff', type=int, default=30000,
-                        help="Iteration for starting evaluation (default: 30000).")
+    parser.add_argument('-n_iter', dest='n_iter', type=int, default=30000,
+                        help="Number of iterations (default: 30000).")
+    parser.add_argument('-startoff', dest='startoff', type=int, default=0,
+                        help="Iteration for starting evaluation (default: 0).")
     parser.add_argument('-batches_per_eval', dest='batches_per_eval', type=int, default=500,
                         help="Number of iterations per evaluation (default: 500).")
-    parser.add_argument('--save', default=True, action=argparse.BooleanOptionalAction,
-                        help="save the predicted results for every evaluation.")
+    parser.add_argument('-save_format', dest='save_format', type=str,default='txt',
+                        help="Saving format (default: txt)")
     #Random seed control
     parser.add_argument('-seed', dest='seed', type=int, default=123,
                         help="Random seed for reproduction (default: 123).")
@@ -67,8 +68,9 @@ def main(args=None):
     data = parse_file(args.input)
     params['v_dim'] = data[-1].shape[1]
     model = CausalEGM(params,random_seed=args.seed)
+    print('Start training...')
     model.train(data=data, batch_size=args.batch_size, n_iter=args.n_iter, batches_per_eval=args.batches_per_eval, 
-                startoff=args.startoff, save=args.save)
+                startoff=args.startoff, save_format=args.save_format)
 
-
-
+if __name__ == "__main__":
+   main()
