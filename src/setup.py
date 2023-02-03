@@ -1,11 +1,8 @@
 import setuptools
 
-with open('requirements.txt') as f:
-    requirements = [l for l in f.read().splitlines() if l]
-
 setuptools.setup(
     name="CausalEGM", 
-    version="0.2.4",
+    version="0.2.5",
     author="Qiao Liu",
     author_email="liuqiao@stanford.edu",
     description="CausalEGM: a general causal inference framework by encoding generative modeling",
@@ -13,7 +10,14 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/SUwonglab/CausalEGM",
     packages=setuptools.find_packages(),
-    install_requires=requirements,
+    install_requires=[
+   'tensorflow-gpu==2.8.0',
+   'tensorflow-determinism==0.3.0',
+   'protobuf==3.20.0',
+   'scikit-learn',
+   'pandas',
+   'python-dateutil'
+    ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
