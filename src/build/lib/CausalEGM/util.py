@@ -91,8 +91,8 @@ class Sim_Sun_sampler(Base_sampler):
         super().__init__(x,y,v,batch_size,normalize=True)
 
 class Sim_Colangelo_sampler(Base_sampler):
-    def __init__(self, batch_size, N=1000, v_dim=100, seed=0,
-                rho=0.5,offset = [-1,0,1]):
+    def __init__(self, batch_size, N=20000, v_dim=100, seed=0,
+                rho=0.5, offset = [-1,0,1], d=1, a=3, b=0.75):
         np.random.seed(seed)
         k = np.array([rho*np.ones(v_dim-1),np.ones(v_dim),rho*np.ones(v_dim-1)])
         sigma = diags(k,offset).toarray()
@@ -100,8 +100,8 @@ class Sim_Colangelo_sampler(Base_sampler):
         epsilon = np.random.normal(0,1,N)
         nu = np.random.normal(0,1,N)
         v = np.random.multivariate_normal(np.zeros(v_dim),sigma,size=[N,])
-        x = norm.cdf((3*v@theta)) + 0.75*nu - 0.5
-        y = 1.2*x + (x**2) + (x*v[:,0]) + 1.2*(v@theta) + epsilon  
+        x = d*norm.cdf((a*v@theta)) + b*nu - 0.5
+        y = 1.2*x + (x**3) + (x*v[:,0]) + 1.2*(v@theta) + epsilon
         x = x.reshape(-1,1)
         y = y.reshape(-1,1)
         super().__init__(x,y,v,batch_size,normalize=True)

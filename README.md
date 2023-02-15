@@ -1,6 +1,9 @@
 [![PyPI](https://img.shields.io/pypi/v/CausalEGM)](https://pypi.org/project/CausalEGM/)
+[![Anaconda](https://anaconda.org/conda-forge/causalegm/badges/version.svg)](https://anaconda.org/conda-forge/causalegm)
 [![Travis (.org)](https://img.shields.io/travis/kimmo1019/CausalEGM)](https://app.travis-ci.com/github/kimmo1019/CausalEGM)
+[![All Platforms](https://dev.azure.com/conda-forge/feedstock-builds/_apis/build/status/causalegm-feedstock?branchName=main)](https://dev.azure.com/conda-forge/feedstock-builds/_build/latest?definitionId=18625&branchName=main)
 [![Documentation Status](https://readthedocs.org/projects/causalegm/badge/?version=latest)](https://causalegm.readthedocs.io)
+
 
 CausalEGM - A general causal inference framework by encoding generative modeling
 ================================================================================
@@ -23,13 +26,15 @@ Note that a GPU is recommended for accelerating the model training. However, GPU
 
 - Estiamte average dose response function (ADRF).
 
-- Estimate heterogenous treatment effect (HTE).
+- Estimate conditional average treatment effect (CATE).
 
 - Built-in simulation and semi-simulation datasets.
 
 Checkout application examples in the [Tutorial](https://causalegm.readthedocs.io/en/latest/get_started.html).
 
 ## Latest News
+
+- Feb/2023: Version 0.2.6 of CausalEGM is released on [Anaconda](https://anaconda.org/conda-forge/causalegm).
 
 - Dec/2022: Preprint paper of CausalEGM is out on [arXiv](https://arxiv.org/abs/2212.05925/).
 

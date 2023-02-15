@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: CausalEGM
-Version: 0.2.5
+Version: 0.2.7
 Summary: CausalEGM: a general causal inference framework by encoding generative modeling
 Home-page: https://github.com/SUwonglab/CausalEGM
 Author: Qiao Liu
@@ -8,7 +8,7 @@ Author-email: liuqiao@stanford.edu
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
-Requires-Python: >=3.6
+Requires-Python: >=3.9
 Description-Content-Type: text/markdown
 License-File: LICENSE
 
