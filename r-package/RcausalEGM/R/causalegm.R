@@ -5,7 +5,6 @@
 #' @param X is the treatment variable.
 #' @param Y is the potential outcome.
 #' @param V is the covariates.
-#' @param yaml_file is the deployment file for initializing a CausalEGM instance.
 #'
 #'
 #' @return NULL
