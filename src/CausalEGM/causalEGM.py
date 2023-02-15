@@ -241,18 +241,13 @@ class CausalEGM(object):
     def evaluate(self, data, nb_intervals=200):
         data_x, data_y, data_v = data
         data_z = self.z_sampler.get_batch(len(data_x))
-        data_v_ = self.g_net.predict(data_z,verbose=0)
         data_z_ = self.e_net.predict(data_v,verbose=0)
-        #data_v_ = self.g_net(data_z)
-        #data_z_ = self.e_net(data_v)
         data_z0 = data_z_[:,:self.params['z_dims'][0]]
         data_z1 = data_z_[:,self.params['z_dims'][0]:sum(self.params['z_dims'][:2])]
         data_z2 = data_z_[:,sum(self.params['z_dims'][:2]):sum(self.params['z_dims'][:3])]
         data_z3 = data_z_[:-self.params['z_dims'][3]:]
         data_y_pred = self.f_net.predict(tf.concat([data_z0, data_z2, data_x], axis=-1),verbose=0)
         data_x_pred = self.h_net.predict(tf.concat([data_z0, data_z1], axis=-1),verbose=0)
-        #data_y_pred = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
-        #data_x_pred = self.h_net(tf.concat([data_z0, data_z1], axis=-1))
         if self.params['binary_treatment']:
             data_x_pred = tf.sigmoid(data_x_pred)
         mse_x = np.mean((data_x-data_x_pred)**2)
@@ -261,8 +256,6 @@ class CausalEGM(object):
             #individual treatment effect (ITE) && average treatment effect (ATE)
             y_pred_pos = self.f_net.predict(tf.concat([data_z0, data_z2, np.ones((len(data_x),1))], axis=-1),verbose=0)
             y_pred_neg = self.f_net.predict(tf.concat([data_z0, data_z2, np.zeros((len(data_x),1))], axis=-1),verbose=0)
-            #y_pred_pos = self.f_net(tf.concat([data_z0, data_z2, np.ones((len(data_x),1))], axis=-1))
-            #y_pred_neg = self.f_net(tf.concat([data_z0, data_z2, np.zeros((len(data_x),1))], axis=-1))
             ite_pre = y_pred_pos-y_pred_neg
             return ite_pre, mse_x, mse_y
         else:
@@ -271,9 +264,24 @@ class CausalEGM(object):
             for x in np.linspace(self.params['x_min'], self.params['x_max'], nb_intervals):
                 data_x = np.tile(x, (len(data_x), 1))
                 y_pred = self.f_net.predict(tf.concat([data_z0, data_z2, data_x], axis=-1),verbose=0)
-                #y_pred = self.f_net(tf.concat([data_z0, data_z2, data_x], axis=-1))
                 dose_response.append(np.mean(y_pred))
             return np.array(dose_response), mse_x, mse_y
+
+    def getCATE(self,data_v):
+        assert len(data_v)==self.params['v_dim']
+        data_v = data_v.reshape(1,-1)
+        data_z = self.z_sampler.get_batch(len(data_v))
+        data_z_ = self.e_net.predict(data_v,verbose=0)
+        data_z0 = data_z_[:,:self.params['z_dims'][0]]
+        data_z1 = data_z_[:,self.params['z_dims'][0]:sum(self.params['z_dims'][:2])]
+        data_z2 = data_z_[:,sum(self.params['z_dims'][:2]):sum(self.params['z_dims'][:3])]
+        data_z3 = data_z_[:-self.params['z_dims'][3]:]
+        if self.params['binary_treatment']:
+            y_pred_pos = self.f_net.predict(tf.concat([data_z0, data_z2, np.ones((len(data_v),1))], axis=-1),verbose=0)
+            y_pred_neg = self.f_net.predict(tf.concat([data_z0, data_z2, np.zeros((len(data_v),1))], axis=-1),verbose=0)
+            ite_pre = y_pred_pos-y_pred_neg
+            print(ite_pre.shape)
+            return np.mean(ite_pre)
 
     def save(self, fname, data):
         if fname[-3:] == 'npy':
