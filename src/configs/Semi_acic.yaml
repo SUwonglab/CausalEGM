@@ -1,10 +1,10 @@
-dataset: Semi_acic
+dataset: Semi_acic_scale
 output_dir: '.'
 v_dim: 177
-z_dims: [10,3,3,4]
+z_dims: [3,3,6,6]
 lr: 0.0002
-alpha: 10
-beta: 10
+alpha: 1
+beta: 1
 gamma: 10
 g_d_freq: 5
 g_units: [64,64,64,64,64]
@@ -13,7 +13,7 @@ f_units: [64,32,8]
 h_units: [64,32,8]
 dz_units: [64,32,8]
 dv_units: [64,32,8]
-save_model: True
+save_model: False
 binary_treatment: True
 use_z_rec: True
 use_v_gan: True
