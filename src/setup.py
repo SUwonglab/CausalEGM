@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="CausalEGM", 
-    version="0.2.9",
+    version="0.3.0",
     author="Qiao Liu",
     author_email="liuqiao@stanford.edu",
     description="CausalEGM: a general causal inference framework by encoding generative modeling",
