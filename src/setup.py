@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="CausalEGM", 
-    version="0.2.7",
+    version="0.2.9",
     author="Qiao Liu",
     author_email="liuqiao@stanford.edu",
     description="CausalEGM: a general causal inference framework by encoding generative modeling",
@@ -11,9 +11,7 @@ setuptools.setup(
     url="https://github.com/SUwonglab/CausalEGM",
     packages=setuptools.find_packages(),
     install_requires=[
-   'tensorflow-gpu==2.8.0',
-   'tensorflow-determinism==0.3.0',
-   'protobuf==3.20.0',
+   'tensorflow==2.8.0',
    'scikit-learn',
    'pandas',
    'python-dateutil'
