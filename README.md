@@ -34,7 +34,7 @@ Checkout application examples in the [Tutorial](https://causalegm.readthedocs.io
 
 ## Latest News
 
-- Feb/2023: CausalEGM is now supporting stand-alone R APIs.
+- Feb/2023: CausalEGM is now supporting stand-alone R package.
 
 - Feb/2023: Version 0.2.6 of CausalEGM is released on [Anaconda](https://anaconda.org/conda-forge/causalegm).
 
