@@ -1,4 +1,4 @@
-tensorflow==2.8.0
+tensorflow>=2.8.0
 scikit-learn
 pandas
 python-dateutil

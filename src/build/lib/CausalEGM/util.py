@@ -29,9 +29,13 @@ class Base_sampler(object):
     def __init__(self, x, y, v, batch_size, normalize=False, random_seed=123):
         assert len(x)==len(y)==len(v)
         np.random.seed(random_seed)
-        self.data_x = x.astype('float32')
-        self.data_y = y.astype('float32')
-        self.data_v = v.astype('float32')
+        self.data_x = np.array(x, dtype='float32')
+        self.data_y = np.array(y, dtype='float32')
+        self.data_v = np.array(v, dtype='float32')
+        if len(self.data_x.shape) == 1:
+            self.data_x = self.data_x.reshape(-1,1)
+        if len(self.data_y.shape) == 1:
+            self.data_y = self.data_y.reshape(-1,1)
         self.batch_size = batch_size
         if normalize:
             self.data_v = StandardScaler().fit_transform(self.data_v)
