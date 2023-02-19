@@ -1,0 +1,19 @@
+---
+title: "continous_treatment"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{continous_treatment}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(RcausalEGM)
+```
