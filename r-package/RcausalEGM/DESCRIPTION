@@ -1,8 +1,8 @@
 Package: RcausalEGM
 Type: Package
 Title: A General Causal Inference Framework by Encoding Generative Modeling
-Version: 0.3.0
-Date: 2023-02-14
+Version: 0.3.1
+Date: 2023-02-22
 Authors@R: c(
     person("Qiao", "Liu", role = c("aut", "cre"), email = "liuqiao@stanford.edu"),
     person("Wing", "Wong", role = "aut"),
@@ -17,9 +17,11 @@ Roxygen: list(markdown = TRUE)
 URL: https://github.com/SUwonglab/CausalEGM
 BugReports: https://github.com/SUwonglab/CausalEGM/issues
 Repository: CRAN
-Depends: R(>= 3.6.3)
+Depends: R(>= 3.6.0)
 RoxygenNote: 7.1.2
 Suggests: 
     rmarkdown,
-    knitr
+    knitr,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
+Config/testthat/edition: 3

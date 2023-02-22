@@ -29,7 +29,9 @@ causalegm(
   use_v_gan = TRUE,
   random_seed = 123,
   n_iter = 30000,
-  normalize = FALSE
+  normalize = FALSE,
+  x_min = NULL,
+  x_max = NULL
 )
 }
 \arguments{
@@ -82,6 +84,10 @@ causalegm(
 \item{n_iter}{is the training iterations. Default: 30000.}
 
 \item{normalize}{whether apply normalization to covariates. Default: FALSE.}
+
+\item{x_min}{ADRF start value. Default: NULL}
+
+\item{x_max}{ADRF end value. Default: NULL}
 }
 \value{
 A trained causalEGM object.
@@ -103,5 +109,5 @@ paste("The average treatment effect (ATE):", round(model$ATE, 2))
 
 }
 \references{
-Qiao Liu, Zhongren Chen, Wing Hung Wong.  CausalEGM: a general causal inference framework by encoding generative modeling\link{J}. \emph{arXiv preprint arXiv:2212.05925, 2022}.
+Qiao Liu, Zhongren Chen, Wing Hung Wong.  CausalEGM: a general causal inference framework by encoding generative modeling. \emph{arXiv preprint arXiv:2212.05925, 2022}.
 }

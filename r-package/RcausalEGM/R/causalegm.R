@@ -13,7 +13,7 @@ install_causalegm <- function(method = "auto",pip = TRUE) {
 #' @title Main function for estimating causal effect in either binary or continuous treatment settings.
 #'
 #' @description This function takes observation data (x,y,v) as input, and estimate the ATE/ITE/ADRF.
-#' @references Qiao Liu, Zhongren Chen, Wing Hung Wong.  CausalEGM: a general causal inference framework by encoding generative modeling[J]. \emph{arXiv preprint arXiv:2212.05925, 2022}.
+#' @references Qiao Liu, Zhongren Chen, Wing Hung Wong.  CausalEGM: a general causal inference framework by encoding generative modeling. \emph{arXiv preprint arXiv:2212.05925, 2022}.
 #' @param x is the treatment variable, one-dimensional array with size n.
 #' @param y is the potential outcome, one-dimensional array with size n.
 #' @param v is the covariates, two-dimensional array with size n by p.
@@ -39,7 +39,8 @@ install_causalegm <- function(method = "auto",pip = TRUE) {
 #' @param random_seed is the random seed to fix randomness. Default: 123.
 #' @param n_iter is the training iterations. Default: 30000.
 #' @param normalize whether apply normalization to covariates. Default: FALSE.
-#'
+#' @param x_min ADRF start value. Default: NULL
+#' @param x_max ADRF end value. Default: NULL
 #' @return  A trained causalEGM object.
 #'
 #' @examples
@@ -78,13 +79,15 @@ causalegm <- function(x, y, v,
                         use_v_gan = TRUE,
                         random_seed = 123,
                         n_iter = 30000,
-                        normalize = FALSE) {
+                        normalize = FALSE,
+                        x_min=NULL,
+                        x_max=NULL) {
 
   if (!(reticulate::py_module_available('CausalEGM'))){
     stop("Please install the CausalEGM package using the function: install_causalegm()")
   }
-  x <- array(data=x, dim=c(n,1))
-  y <- array(data=y, dim=c(n,1))
+  x <- array(data=x, dim=c(length(x),1))
+  y <- array(data=y, dim=c(length(y),1))
   v_dim <- dim(v)[2]
   params <- list(output_dir = output_dir,
                  dataset = dataset,
@@ -104,7 +107,9 @@ causalegm <- function(x, y, v,
                  save_model = save_model,
                  binary_treatment = binary_treatment,
                  use_z_rec = use_z_rec,
-                 use_v_gan = use_v_gan)
+                 use_v_gan = use_v_gan,
+                 x_min = x_min,
+                 x_max = x_max)
 
   cegm <- reticulate::import("CausalEGM")
   model <- cegm$CausalEGM(params=params,random_seed=as.integer(random_seed))
