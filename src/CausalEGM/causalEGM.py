@@ -245,7 +245,6 @@ class CausalEGM(object):
         data_z0 = data_z_[:,:self.params['z_dims'][0]]
         data_z1 = data_z_[:,self.params['z_dims'][0]:sum(self.params['z_dims'][:2])]
         data_z2 = data_z_[:,sum(self.params['z_dims'][:2]):sum(self.params['z_dims'][:3])]
-        data_z3 = data_z_[:-self.params['z_dims'][3]:]
         data_y_pred = self.f_net.predict(tf.concat([data_z0, data_z2, data_x], axis=-1),verbose=0)
         data_x_pred = self.h_net.predict(tf.concat([data_z0, data_z1], axis=-1),verbose=0)
         if self.params['binary_treatment']:
@@ -278,7 +277,26 @@ class CausalEGM(object):
         data_z2 = data_z_[:,sum(self.params['z_dims'][:2]):sum(self.params['z_dims'][:3])]
         data_y_pred = self.f_net.predict(tf.concat([data_z0, data_z2, data_x], axis=-1),verbose=0)
         return np.squeeze(data_y_pred)
-
+    
+    def getADRF(self, x_list, data_v=None):
+        if data_v is None:
+            data_v = self.data_sampler.load_all()[-1]
+        data_z = self.z_sampler.get_batch(len(data_v))
+        data_z_ = self.e_net.predict(data_v,verbose=0)
+        data_z0 = data_z_[:,:self.params['z_dims'][0]]
+        data_z1 = data_z_[:,self.params['z_dims'][0]:sum(self.params['z_dims'][:2])]
+        data_z2 = data_z_[:,sum(self.params['z_dims'][:2]):sum(self.params['z_dims'][:3])]
+        if not self.params['binary_treatment']:
+            dose_response = []
+            for x in x_list:
+                data_x = np.tile(x, (len(data_v), 1))
+                y_pred = self.f_net.predict(tf.concat([data_z0, data_z2, data_x], axis=-1),verbose=0)
+                dose_response.append(np.mean(y_pred))
+            return np.array(dose_response)
+        else:
+            print('ADRF is only applicable in continuous treatment setting!')
+            sys.exit()
+    
     def getCATE(self,data_v):
         assert data_v.shape[1] == self.params['v_dim']
         data_z = self.z_sampler.get_batch(len(data_v))
@@ -292,8 +310,9 @@ class CausalEGM(object):
             cate_pre = y_pred_pos-y_pred_neg
             return np.squeeze(cate_pre)
         else:
-            print('CATE is only applicable in binary treatment case!')
+            print('CATE is only applicable in binary treatment setting!')
             sys.exit()
+    
 
     def save(self, fname, data):
         if fname[-3:] == 'npy':
