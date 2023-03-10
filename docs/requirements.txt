@@ -3,3 +3,7 @@ nbsphinx
 sphinx-autobuild
 recommonmark
 sphinx_markdown_tables
+tensorflow
+scikit-learn
+pandas
+python-dateutil
