@@ -1,6 +1,3 @@
-.. module:: CausalEGM
-.. automodule:: CausalEGM
-   :noindex:
 
 API
 ====
