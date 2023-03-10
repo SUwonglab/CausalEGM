@@ -7,12 +7,8 @@ Import CausalEGM as::
 
    import CausalEGM as cegm
 
-
-After reading the data (``scv.read``) or loading an in-built dataset (``scv.datasets.*``),
-the typical workflow consists of subsequent calls of
-preprocessing (``scv.pp.*``), analysis tools (``scv.tl.*``) and plotting (``scv.pl.*``).
-Further, several utilities (``scv.utils.*``) are provided to facilitate data analysis.
-
+We provide the causal models (``cegm.causalEGM.*``) for implementing a causal inferece model.
+Besides, we host some published datasets (``cegm.util.*``) that are useful for benchmarking and testing models.
 
 Models
 -----------

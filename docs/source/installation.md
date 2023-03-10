@@ -10,13 +10,13 @@ CausalEGM can be installed via [Pip], [Conda], and GitHub for Python users. Caus
 
 2. Take venv for instance. Create a virtual environment:
 
-    ```
+    ```shell
     python3 -m venv <venv_path>
     ```
 
 3. Activate the virtual environment:
 
-    ```
+    ```shell
     source <venv_path>/bin/activate
     ```
 
@@ -26,13 +26,13 @@ CausalEGM can be installed via [Pip], [Conda], and GitHub for Python users. Caus
 
 2. Create a new conda environment:
 
-    ```
+    ```shell
     conda create -n causalegm-env python=3.9
     ```
 
 3. Activate your environment:
 
-    ```
+    ```shell
     conda activate causalegm-env
     ```
 
@@ -46,24 +46,24 @@ Training CausalEGM model will be faster when accelerated with a GPU (not a must)
 
 Install CausalEGM from PyPI using:
 
-```
-pip install CausalEGM
-```
+    ```shell
+    pip install CausalEGM
+    ```
 
 If you get a `Permission denied` error, use `pip install CausalEGM --user` instead. Pip will automatically install all the dependent packages, such as TensorFlow.
 
 Alteratively, CausalEGM can also be installed through GitHub using::
 
-```
- pip install git+https://github.com/SUwonglab/CausalEGM.git
-```
+    ```shell
+    pip install git+https://github.com/SUwonglab/CausalEGM.git
+    ```
     
 or:
 
-``` 
+    ``` shell
     git clone https://github.com/SUwonglab/CausalEGM && cd CausalEGM/src
     pip install -e .
-```
+    ```
 
 ``-e`` is short for ``--editable`` and links the package to the original cloned
 location such that pulled changes are also reflected in the environment.
@@ -72,19 +72,19 @@ location such that pulled changes are also reflected in the environment.
 
 1. CausalEGM can also be downloaded through conda-forge. Add `conda-forge` as the highest priority channel:
 
-    ```
+    ```shell
     conda config --add channels conda-forge
     ```
 
 2. Activate strict channel priority:
 
-    ```
+    ```shell
     conda config --set channel_priority strict
     ```
 
 3. Install CausalEGM from conda-forge channel:
 
-    ```
+    ```shell
     conda install -c conda-forge causalegm
     ```
 
@@ -95,13 +95,13 @@ We provide a standard alone R package of CausalEGM via Reticulate.
 
 The easiest way to install CausalEGM for R is via CRAN:
 
-    ```
+    ```R
     install.packages("RcausalEGM")
     ```
 
 Alternatively, users can also install RcausalEGM from GitHub source using devtools: 
 
-    ```
+    ```R
     devtools::install_github("SUwonglab/CausalEGM", subdir = "r-package/RcausalEGM")
     ```
 
