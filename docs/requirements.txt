@@ -1,2 +1,5 @@
 sphinx_autodoc_typehints
 nbsphinx
+sphinx-autobuild
+recommonmark
+sphinx_markdown_tables
