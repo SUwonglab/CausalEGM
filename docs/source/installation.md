@@ -46,7 +46,7 @@ Training CausalEGM model will be faster when accelerated with a GPU (not a must)
 
 Install CausalEGM from PyPI using:
 
-    ```shell
+    ```
     pip install CausalEGM
     ```
 
@@ -54,13 +54,13 @@ If you get a `Permission denied` error, use `pip install CausalEGM --user` inste
 
 Alteratively, CausalEGM can also be installed through GitHub using::
 
-    ```shell
+    ```
     pip install git+https://github.com/SUwonglab/CausalEGM.git
     ```
     
 or:
 
-    ``` shell
+    ``` 
     git clone https://github.com/SUwonglab/CausalEGM && cd CausalEGM/src
     pip install -e .
     ```
@@ -95,13 +95,13 @@ We provide a standard alone R package of CausalEGM via Reticulate.
 
 The easiest way to install CausalEGM for R is via CRAN:
 
-    ```R
+    ```
     install.packages("RcausalEGM")
     ```
 
 Alternatively, users can also install RcausalEGM from GitHub source using devtools: 
 
-    ```R
+    ```
     devtools::install_github("SUwonglab/CausalEGM", subdir = "r-package/RcausalEGM")
     ```
 
