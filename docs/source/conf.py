@@ -18,9 +18,10 @@ from sphinx.environment import BuildEnvironment
 from sphinx.ext import autosummary
 
 HERE = Path(__file__).parent
-sys.path.insert(0, str(HERE.parent.parent))
-sys.path.insert(0, str(HERE.parent.parent / "src"))
-sys.path.insert(0, os.path.abspath("_ext"))
+#sys.path.insert(0, str(HERE.parent.parent))
+#sys.path.insert(0, str(HERE.parent.parent / "src"))
+#sys.path.insert(0, os.path.abspath("_ext"))
+sys.path.insert(0, os.path.abspath(__file__+'../../../../src'))
 
 # remove PyCharm’s old six module
 
