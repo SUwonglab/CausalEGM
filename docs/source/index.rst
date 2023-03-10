@@ -1,4 +1,4 @@
-|PyPI| |travis| |Docs|
+|PyPI| |Anaconda| |travis| |Platforms| |Docs|
 
 
 
@@ -53,6 +53,7 @@ Your help to improve CausalEGM is highly appreciated!
 
    about
    installation
+   api/index
    release_notes
 
 .. toctree::
@@ -63,9 +64,14 @@ Your help to improve CausalEGM is highly appreciated!
    get_started
 
 
-
 .. |PyPI| image:: https://img.shields.io/pypi/v/CausalEGM
    :target: https://pypi.org/project/CausalEGM/
+
+.. |Anaconda| image:: https://anaconda.org/conda-forge/causalegm/badges/version.svg
+   :target: https://anaconda.org/conda-forge/causalegm
+
+.. |Platforms| image:: https://dev.azure.com/conda-forge/feedstock-builds/_apis/build/status/causalegm-feedstock?branchName=main
+   :target: https://dev.azure.com/conda-forge/feedstock-builds/_build/latest?definitionId=18625&branchName=main
 
 .. |Docs| image:: https://readthedocs.org/projects/causalegm/badge/?version=latest
    :target: https://causalegm.readthedocs.io

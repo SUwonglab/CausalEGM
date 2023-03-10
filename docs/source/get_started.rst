@@ -20,10 +20,10 @@ Then the instructions for all arguments will be printed. Most of the parameters 
 
 
 Use CausalEGM Python API
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Model initialization
-''''''''''''''''''''
+''''''''''''''''''''''''
 
 Import CausalEGM as::
 
@@ -41,10 +41,10 @@ Model training using::
     model.train(data, batch_size=32)
 
 Use CausalEGM R API
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 
 Import CausalEGM into a R enviornment
-''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''
 
 Import CausalEGM as::
 

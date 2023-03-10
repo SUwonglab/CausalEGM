@@ -5,6 +5,10 @@ Release Notes
 =============
 
 
+Version 0.3.1 :small:`Feb 16, 2023`
+-----------------------------------
+- Release standard R package
+
 Version 0.2.2 :small:`Dec 14, 2022`
 -----------------------------------
 - Support linux command
