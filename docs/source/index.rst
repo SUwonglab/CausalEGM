@@ -53,7 +53,7 @@ Your help to improve CausalEGM is highly appreciated!
 
    about
    installation
-   api/index
+   api
    release_notes
 
 .. toctree::
