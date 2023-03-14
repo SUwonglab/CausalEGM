@@ -26,7 +26,31 @@ def Dataset_selector(name):
         sys.exit()
 
 class Base_sampler(object):
-    def __init__(self, x, y, v, batch_size, normalize=False, random_seed=123):
+    """Base data sampler.
+
+    Parameters
+    ----------
+    x
+        List or Numpy.ndarray bject denoting the treatment with length N or shape (N, 1) or (N, ). 
+    y
+        List or Numpy.ndarray bject denoting the outcome with length N or shape (N, 1) or (N, ). 
+    v
+        List or Numpy.ndarray bject denoting the covariates with length N or shape (N, v_dim). 
+    batch_size
+        Int object denoting the batch size for mini-batch training. Default: ``32``.
+
+    Examples
+    --------
+    >>> from CausalEGM import Base_sampler
+    >>> import numpy as np
+    >>> x = np.random.normal(size=(2000,))
+    >>> y = np.random.normal(size=(2000,))
+    >>> v = np.random.normal(size=(2000,100))
+    >>> ds = Base_sampler(x=x,y=y,v=v)
+    >>> batch = ds.next_batch() # get a batch of data
+    >>> data = ds.load_all() # get all data as a triplet
+    """
+    def __init__(self, x, y, v, batch_size=32, normalize=False, random_seed=123):
         assert len(x)==len(y)==len(v)
         np.random.seed(random_seed)
         self.data_x = np.array(x, dtype='float32')
@@ -62,7 +86,26 @@ class Base_sampler(object):
         return self.data_x, self.data_y, self.data_v
 
 class Semi_acic_sampler(Base_sampler):
-    def __init__(self, batch_size, path='../data/ACIC_2018', 
+    """ACIC 2018 competition dataset (binary treatment) sampler (inherited from Base_sampler).
+
+    Parameters
+    ----------
+    batch_size
+        Int object denoting the batch size for mini-batch training. Default: ``32``.
+    path
+        Str object denoting the path to the original dataset.
+    ufid
+        Str object denoting the unique id of a specific semi-synthetic setting.
+    Examples
+    --------
+    >>> from CausalEGM import Semi_acic_sampler
+    >>> import numpy as np
+    >>> x = np.random.normal(size=(2000,))
+    >>> y = np.random.normal(size=(2000,))
+    >>> v = np.random.normal(size=(2000,100))
+    >>> ds = Semi_acic_sampler(path='../data/ACIC_2018',ufid='d5bd8e4814904c58a79d7cdcd7c2a1bb')
+    """
+    def __init__(self, batch_size=32, path='../data/ACIC_2018', 
                 ufid='d5bd8e4814904c58a79d7cdcd7c2a1bb'):
         self.df_covariants = pd.read_csv('%s/x.csv'%path, index_col='sample_id',header=0, sep=',')
         self.df_sim = pd.read_csv('%s/scaling/factuals/%s.csv'%(path, ufid),index_col='sample_id',header=0, sep=',')
@@ -70,10 +113,27 @@ class Semi_acic_sampler(Base_sampler):
         x = dataset['z'].values.reshape(-1,1)
         y = dataset['y'].values.reshape(-1,1)
         v = dataset.values[:,:-2]
-        super().__init__(x,y,v,batch_size,normalize=True)
+        super().__init__(x,y,v,batch_size=batch_size,normalize=True)
 
 class Sim_Hirano_Imbens_sampler(Base_sampler):
-    def __init__(self, batch_size, N=20000, v_dim=200, seed=0):
+    """Hirano Imbens simulation dataset (continuous treatment) sampler (inherited from Base_sampler).
+
+    Parameters
+    ----------
+    batch_size
+        Int object denoting the batch size for mini-batch training. Default: ``32``.
+    N
+        Sample size. Default: ``20000``.
+    v_dim
+        Int object denoting the dimension for covariates. Default: ``200``.
+    seed
+        Int object denoting the random seed. Default: ``0``.
+    Examples
+    --------
+    >>> from CausalEGM import Sim_Hirano_Imbens_sampler
+    >>> ds = Sim_Hirano_Imbens_sampler(batch_size=32, N=20000, v_dim=200, seed=0)
+    """
+    def __init__(self, batch_size=32, N=20000, v_dim=200, seed=0):
         np.random.seed(seed)
         v = np.random.exponential(scale=1.0, size=(N, v_dim))
         rate = v[:,0] + v[:,1]
@@ -82,9 +142,26 @@ class Sim_Hirano_Imbens_sampler(Base_sampler):
         y = np.random.normal(x + (v[:,0] + v[:,2]) * np.exp(-x * (v[:,0] + v[:,2])) , 1)
         x = x.reshape(-1,1)
         y = y.reshape(-1,1)
-        super().__init__(x,y,v,batch_size,normalize=True)
+        super().__init__(x,y,v,batch_size=batch_size,normalize=True)
 
 class Sim_Sun_sampler(Base_sampler):
+    """Sun simulation dataset (continuous treatment) sampler (inherited from Base_sampler).
+
+    Parameters
+    ----------
+    batch_size
+        Int object denoting the batch size for mini-batch training. Default: ``32``.
+    N
+        Sample size. Default: ``20000``.
+    v_dim
+        Int object denoting the dimension for covariates. Default: ``200``.
+    seed
+        Int object denoting the random seed. Default: ``0``.
+    Examples
+    --------
+    >>> from CausalEGM import Sim_Sun_sampler
+    >>> ds = Sim_Sun_sampler(batch_size=32, N=20000, v_dim=200, seed=0)
+    """
     def __init__(self, batch_size, N=20000, v_dim=200, seed=0):
         np.random.seed(seed)
         v = np.random.normal(0, 1, size=(N, v_dim))        
@@ -92,10 +169,27 @@ class Sim_Sun_sampler(Base_sampler):
         y = np.random.normal(((v[:,0] - 1/2)+ np.cos(v[:,1]) + (v[:,4])**2 + (v[:,5])) + x, 1)       
         x = x.reshape(-1,1)
         y = y.reshape(-1,1)
-        super().__init__(x,y,v,batch_size,normalize=True)
+        super().__init__(x,y,v,batch_size=batch_size,normalize=True)
 
 class Sim_Colangelo_sampler(Base_sampler):
-    def __init__(self, batch_size, N=20000, v_dim=100, seed=0,
+    """Colangelo simulation dataset (continuous treatment) sampler (inherited from Base_sampler).
+
+    Parameters
+    ----------
+    batch_size
+        Int object denoting the batch size for mini-batch training. Default: ``32``.
+    N
+        Sample size. Default: ``20000``.
+    v_dim
+        Int object denoting the dimension for covariates. Default: ``200``.
+    seed
+        Int object denoting the random seed. Default: ``0``.
+    Examples
+    --------
+    >>> from CausalEGM import Sim_Colangelo_sampler
+    >>> ds = Sim_Colangelo_sampler(batch_size=32, N=20000, v_dim=100, seed=0)
+    """
+    def __init__(self, batch_size=32, N=20000, v_dim=100, seed=0,
                 rho=0.5, offset = [-1,0,1], d=1, a=3, b=0.75):
         np.random.seed(seed)
         k = np.array([rho*np.ones(v_dim-1),np.ones(v_dim),rho*np.ones(v_dim-1)])
@@ -108,10 +202,25 @@ class Sim_Colangelo_sampler(Base_sampler):
         y = 1.2*x + (x**3) + (x*v[:,0]) + 1.2*(v@theta) + epsilon
         x = x.reshape(-1,1)
         y = y.reshape(-1,1)
-        super().__init__(x,y,v,batch_size,normalize=True)
+        super().__init__(x,y,v,batch_size=batch_size,normalize=True)
 
 class Semi_Twins_sampler(Base_sampler):
-    def __init__(self, batch_size, seed=0,
+    """Twins semi synthetic  dataset sampler (inherited from Base_sampler).
+
+    Parameters
+    ----------
+    batch_size
+        Int object denoting the batch size for mini-batch training. Default: ``32``.
+    seed
+        Int object denoting the random seed. Default: ``0``.
+    path
+        Str obejct denoting the path to the original data.
+    Examples
+    --------
+    >>> from CausalEGM import Semi_Twins_sampler
+    >>> ds = Semi_Twins_sampler(batch_size=32, path='../data/Twins')
+    """
+    def __init__(self, batch_size=32, seed=0,
                 path='../data/Twins'):
         covariate_df = pd.read_csv('%s/twin_pairs_X_3years_samesex.csv'%path).iloc[:,2:].drop(['infant_id_0', 'infant_id_1'], axis=1)
         treatment_df_ = pd.read_csv('%s/twin_pairs_T_3years_samesex.csv'%path).iloc[:,1:]
@@ -136,21 +245,7 @@ class Semi_Twins_sampler(Base_sampler):
         auxiliary_constant =  np.mean(np.dot(v, gamma))
         x = x.reshape(-1,1)
         y = y.reshape(-1,1)
-        super().__init__(x,y,v,batch_size,normalize=True)
-
-class Semi_ihdp_sampler(object):
-    def __init__(self, N = 20000, v_dim=25, path='../data/IHDP_100', ufid='ihdp_npci_1'):
-        self.data_all = np.loadtxt('%s/%s.csv'%(path, ufid), delimiter=',')
-        x = self.data_all[:,0].reshape(-1,1)
-        v = self.data_all[:,5:]
-        y = self.data_all[:,1].reshape(-1,1)
-        self.sample_size = len(x)
-        self.v_dim = v_dim
-        v = v.astype('float32')
-        x = x.astype('float32')
-        y = y.astype('float32')
-        super().__init__(x,y,v,batch_size,normalize=True)
-
+        super().__init__(x,y,v,batch_size=batch_size,normalize=True)
 
 class Gaussian_sampler(object):
     def __init__(self, mean, sd=1, N=20000):
