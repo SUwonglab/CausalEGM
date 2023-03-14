@@ -19,4 +19,5 @@ dv_units: [64,32,8]
 binary_treatment: False
 use_z_rec: True
 use_v_gan: False
-save_model: True
+save_model: False
+save_res: True
