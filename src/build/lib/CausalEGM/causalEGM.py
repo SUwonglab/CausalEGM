@@ -67,7 +67,7 @@ class CausalEGM(object):
         self.save_dir = "{}/results/{}/{}".format(
             params['output_dir'], params['dataset'], self.timestamp)
 
-        if not os.path.exists(self.save_dir):
+        if self.params['save_res'] and not os.path.exists(self.save_dir):
             os.makedirs(self.save_dir)   
 
         self.ckpt = tf.train.Checkpoint(g_net = self.g_net,
@@ -272,9 +272,10 @@ class CausalEGM(object):
             Str object denoting the format (csv, txt, npz) to save the results. Default: ``txt``.
         
         """
-        f_params = open('{}/params.txt'.format(self.save_dir),'w')
-        f_params.write(str(self.params))
-        f_params.close()
+        if self.params['save_res']:
+            f_params = open('{}/params.txt'.format(self.save_dir),'w')
+            f_params.write(str(self.params))
+            f_params.close()
         if data is None and data_file is None:
             self.data_sampler = Dataset_selector(self.params['dataset'])(batch_size=batch_size)
         elif data is not None:
@@ -314,9 +315,10 @@ class CausalEGM(object):
                     if self.params['save_model']:
                         ckpt_save_path = self.ckpt_manager.save(batch_idx)
                         #print('Saving checkpoint for iteration {} at {}'.format(batch_idx, ckpt_save_path))
-                if batch_idx > 0 and batch_idx % batches_per_save == 0:
+                if self.params['save_res'] and batch_idx > 0 and batch_idx % batches_per_save == 0:
                     self.save('{}/causal_pre_at_{}.{}'.format(self.save_dir, batch_idx, save_format), self.best_causal_pre)
-        self.save('{}/causal_pre_final.{}'.format(self.save_dir,save_format), self.best_causal_pre)
+        if self.params['save_res']:
+            self.save('{}/causal_pre_final.{}'.format(self.save_dir,save_format), self.best_causal_pre)
 
         if self.params['binary_treatment']:
             self.ATE = np.mean(self.best_causal_pre)
@@ -529,7 +531,7 @@ class VariationalCausalEGM(object):
         self.save_dir = "{}/results/{}/{}".format(
             params['output_dir'], params['dataset'], self.timestamp)
 
-        if not os.path.exists(self.save_dir):
+        if self.params['save_res'] and not os.path.exists(self.save_dir):
             os.makedirs(self.save_dir)
 
         self.ckpt = tf.train.Checkpoint(g_net = self.g_net,
@@ -721,9 +723,10 @@ class VariationalCausalEGM(object):
                     if self.params['save_model']:
                         ckpt_save_path = self.ckpt_manager.save(batch_idx)
                         #print('Saving checkpoint for iteration {} at {}'.format(batch_idx, ckpt_save_path))
-                if batch_idx > 0 and batch_idx % batches_per_save == 0:
+                if self.params['save_res'] and batch_idx > 0 and batch_idx % batches_per_save == 0:
                     self.save('{}/causal_pre_at_{}.{}'.format(self.save_dir, batch_idx, save_format), self.best_causal_pre)
-        self.save('{}/causal_pre_final.{}'.format(self.save_dir,save_format), self.best_causal_pre)
+        if self.params['save_res']:
+            self.save('{}/causal_pre_final.{}'.format(self.save_dir,save_format), self.best_causal_pre)
         if self.params['binary_treatment']:
             self.ATE = np.mean(self.best_causal_pre)
             print('The average treatment effect (ATE) is ', self.ATE)
