@@ -32,6 +32,7 @@ install_causalegm <- function(method = "auto",pip = TRUE) {
 #' @param h_units is the list of hidden nodes in the h network for predicting \eqn{x}. Default: c(64,32,8).
 #' @param dv_units is the list of hidden nodes in the discriminator for distribution match \eqn{v}. Default: c(64,32,8).
 #' @param dz_units is the list of hidden nodes in the discriminator for distribution match \eqn{z}. Default: c(64,32,8).
+#' @param save_res whether to save the trained model. Default: TRUE.
 #' @param save_model whether to save the trained model. Default: FALSE.
 #' @param binary_treatment whether the treatment is binary or continuous. Default: TRUE.
 #' @param use_z_rec whether to use the reconstruction loss for \eqn{z}. Default: TRUE.
@@ -74,6 +75,7 @@ causalegm <- function(x, y, v,
                         dv_units = c(64,32,8),
                         dz_units = c(64,32,8),
                         save_model = FALSE,
+                        save_res = FALSE,
                         binary_treatment = TRUE,
                         use_z_rec = TRUE,
                         use_v_gan = TRUE,
@@ -105,6 +107,7 @@ causalegm <- function(x, y, v,
                  dv_units = dv_units,
                  dz_units = dz_units,
                  save_model = save_model,
+                 save_res = save_res,
                  binary_treatment = binary_treatment,
                  use_z_rec = use_z_rec,
                  use_v_gan = use_v_gan,
