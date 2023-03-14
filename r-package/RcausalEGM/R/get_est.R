@@ -19,7 +19,8 @@
 #' n_test <- 100
 #' v_test <- matrix(rnorm(n_test * p), n_test, p)
 #' x_test <- rbinom(n_test, 1, 0.4 + 0.2 * (v_test[, 1] > 0))
-#' pred <- predict(model, x_test, v_test)
+#' pred_cate <- get_est(model, v_test) # CATE estimate
+#' pred_y <- get_est(model, v_test, x = x_test) # y given treatment x plus covariates v
 #' }
 #' @export get_est
 get_est <- function(object, v, x = NULL) {
