@@ -23,6 +23,7 @@ causalegm(
   h_units = c(64, 32, 8),
   dv_units = c(64, 32, 8),
   dz_units = c(64, 32, 8),
+  save_res = FALSE,
   save_model = FALSE,
   binary_treatment = TRUE,
   use_z_rec = TRUE,
@@ -70,6 +71,8 @@ causalegm(
 \item{dv_units}{is the list of hidden nodes in the discriminator for distribution match \eqn{v}. Default: c(64,32,8).}
 
 \item{dz_units}{is the list of hidden nodes in the discriminator for distribution match \eqn{z}. Default: c(64,32,8).}
+
+\item{save_res}{whether to save the results during training. Default: FALSE.}
 
 \item{save_model}{whether to save the trained model. Default: FALSE.}
 
