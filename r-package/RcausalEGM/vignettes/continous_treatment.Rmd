@@ -20,6 +20,12 @@ set.seed(123)
 library(RcausalEGM)
 ```
 
+```{r check_pkg}
+if (!(reticulate::py_module_available('CausalEGM'))){
+  skip("Please install the CausalEGM package using the function: install_causalegm()")
+}
+```
+
 ## Data Generation
 
 Let's first generate a simulation dataset with continuous treatment.

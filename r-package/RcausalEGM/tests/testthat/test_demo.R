@@ -1,5 +1,7 @@
 library(RcausalEGM)
-
+if (!(reticulate::py_module_available('CausalEGM'))){
+    skip("CausalEGM not available for testing")
+}
 #Generate a simple simulation data.
 n <- 1000
 p <- 10
