@@ -270,8 +270,8 @@ class CausalEGM(object):
             Bool object denoting whether showing the progress bar. Default: ``False``.
         save_format
             Str object denoting the format (csv, txt, npz) to save the results. Default: ``txt``.
-        
         """
+        
         if self.params['save_res']:
             f_params = open('{}/params.txt'.format(self.save_dir),'w')
             f_params.write(str(self.params))

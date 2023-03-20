@@ -270,8 +270,8 @@ class CausalEGM(object):
             Bool object denoting whether showing the progress bar. Default: ``False``.
         save_format
             Str object denoting the format (csv, txt, npz) to save the results. Default: ``txt``.
-        
         """
+        
         if self.params['save_res']:
             f_params = open('{}/params.txt'.format(self.save_dir),'w')
             f_params.write(str(self.params))
@@ -322,7 +322,7 @@ class CausalEGM(object):
 
         if self.params['binary_treatment']:
             self.ATE = np.mean(self.best_causal_pre)
-            print('The average treatment effect (ATE) is ', self.ATE)
+            print('The average treatment effect (ATE) is', self.ATE)
 
     def evaluate(self, data, nb_intervals=200):
         """Internal evaluation in the training process of CausalEGM.
