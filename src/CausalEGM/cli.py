@@ -25,9 +25,9 @@ def main(args=None):
     parser.add_argument('-lr', dest='lr', type=float, default=0.0002,
                         help="Learning rate for the optimizer (default: 0.0002).")
     parser.add_argument('-alpha', dest='alpha', type=float, default=1.,
-                        help="Coefficient for reconstruction loss (default: 10).")
+                        help="Coefficient for reconstruction loss (default: 1).")
     parser.add_argument('-beta', dest='beta', type=float, default=1.,
-                        help="Coefficient for roundtrip loss (default: 10).")
+                        help="Coefficient for treatment and outcome MSE loss (default: 1).")
     parser.add_argument('-gamma', dest='gamma', type=float, default=10.,
                         help="Coefficient for gradient penalty loss (default: 10).")
     parser.add_argument('-g_d_freq', dest='g_d_freq', type=int, default=5,
@@ -60,6 +60,8 @@ def main(args=None):
                         help="Number of iterations per evaluation (default: 500).")
     parser.add_argument('-save_format', dest='save_format', type=str,default='txt',
                         help="Saving format (default: txt)")
+    parser.add_argument('--save_res', default=True, action=argparse.BooleanOptionalAction,
+                        help="Whether to save results during training.")
     #Random seed control
     parser.add_argument('-seed', dest='seed', type=int, default=123,
                         help="Random seed for reproduction (default: 123).")
