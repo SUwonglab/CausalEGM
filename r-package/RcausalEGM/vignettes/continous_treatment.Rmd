@@ -22,7 +22,8 @@ library(RcausalEGM)
 
 ```{r check_pkg}
 if (!(reticulate::py_module_available('CausalEGM'))){
-  skip("Please install the CausalEGM package using the function: install_causalegm()")
+  cat("## Please install the CausalEGM package using the function: install_causalegm()")
+  knitr::knit_exit()
 }
 ```
 
