@@ -30,7 +30,7 @@ Note that a GPU is recommended for accelerating the model training. However, GPU
 
 - Built-in simulation and semi-simulation datasets.
 
-Checkout application examples in the [Tutorial_Py](https://causalegm.readthedocs.io/en/latest/tutorial_py.html) and [Tutorial_Py](https://causalegm.readthedocs.io/en/latest/tutorial_r.html).
+Checkout application examples in the [Python Tutorial](https://causalegm.readthedocs.io/en/latest/tutorial_py.html) and [R Tutorial](https://causalegm.readthedocs.io/en/latest/tutorial_r.html).
 
 ## Latest News
 
