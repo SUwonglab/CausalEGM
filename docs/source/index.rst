@@ -18,18 +18,19 @@ By conditioning on the low-dimensional latent features, CausalEGM can estimate t
 
 CausalEGM's key applications
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-- estimate average treatment effect (ATE).
-- estimate individual treatment effect (ITE).
-- estiamte average dose response function (ADRF).
-- estimate heterogenous treatment effect (HTE).
-- built-in simulation and semi-simulation datasets.
+- Estimate average treatment effect (ATE).
+- Estimate individual treatment effect (ITE).
+- Estiamte average dose response function (ADRF).
+- Estimate heterogenous treatment effect (HTE).
+- Built-in simulation and semi-simulation datasets.
 
 
 Latest news
 ^^^^^^^^^^^
-- Jan/2023: CausalEGM is now supporting API calling with R language.
-- Dec/2022: Preprint paper of CausalEGM is out on `arXiv <https://arxiv.org/abs/2212.05925/>`__ 
-- Aug/2022: Version 0.1.0 of CausalEGM is released on `PyPI <https://pypi.org/project/epiaster/>`_ 
+- Feb/2023: CausalEGM is now supporting stand-alone R package.
+- Feb/2023: Version 0.2.6 of CausalEGM is released on `Anaconda <https://anaconda.org/conda-forge/causalegm/>`_ .
+- Dec/2022: Preprint paper of CausalEGM is out on `arXiv <https://arxiv.org/abs/2212.05925/>`__.
+- Aug/2022: Version 0.1.0 of CausalEGM is released on `PyPI <https://pypi.org/project/epiaster/>`_. 
 
 Main References
 ^^^^^^^^^^^^^^^
