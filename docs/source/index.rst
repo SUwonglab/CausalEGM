@@ -61,7 +61,9 @@ Your help to improve CausalEGM is highly appreciated!
    :maxdepth: 1
    :hidden:
 
-   get_started
+   tutorial_py
+   tutorial_r
+   
 
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/CausalEGM
