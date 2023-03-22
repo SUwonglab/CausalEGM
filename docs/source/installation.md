@@ -91,7 +91,7 @@ location such that pulled changes are also reflected in the environment.
 ## Install R package (RcausalEGM)
 
 
-We provide a standard alone R package of CausalEGM via Reticulate.
+We provide a standard alone R package of CausalEGM via [Reticulate](https://rstudio.github.io/reticulate/), which is named [RcausalEGM](https://github.com/SUwonglab/CausalEGM/tree/main/r-package/RcausalEGM).
 
 The easiest way to install CausalEGM for R is via CRAN:
 
@@ -104,6 +104,8 @@ Alternatively, users can also install RcausalEGM from GitHub source using devtoo
     ```
     devtools::install_github("SUwonglab/CausalEGM", subdir = "r-package/RcausalEGM")
     ```
+
+For Rstudio users, CausalEGM R packages can also be installed locally by directly opening the R project file [RcausalEGM.Rproj](https://github.com/SUwonglab/CausalEGM/blob/main/r-package/RcausalEGM/RcausalEGM.Rproj).
 
 [Python]: https://www.python.org/downloads/
 [Pip]: https://pypi.org/project/CausalEGM/
