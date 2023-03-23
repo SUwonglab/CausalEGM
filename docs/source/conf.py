@@ -81,7 +81,7 @@ author = "Qiao Liu"
 title = "A general causal inference framework by encoding generative modeling"
 copyright = f"{datetime.now():%Y}, {author}"
 
-
-
-
 html_theme = "sphinx_rtd_theme"
+
+html_theme_options = dict(navigation_depth=4, logo_only=True)  # Only show the logo
+html_logo = 'logo.png'
