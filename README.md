@@ -5,7 +5,7 @@
 [![Documentation Status](https://readthedocs.org/projects/causalegm/badge/?version=latest)](https://causalegm.readthedocs.io)
 
 
-# <a href='https://causalegm.readthedocs.io/'><img src='https://raw.githubusercontent.com/SUwonglab/CausalEGM/main/docs/source/logo.png' align="left" height="80" /></a> A general causal inference framework by encoding generative modeling 
+# <a href='https://causalegm.readthedocs.io/'><img src='https://raw.githubusercontent.com/SUwonglab/CausalEGM/main/docs/source/logo.png' align="left" height="60" /></a> A general causal inference framework by encoding generative modeling 
 
 
 <img align="left" src="https://github.com/SUwonglab/CausalEGM/blob/main/model.jpg" width="350">
