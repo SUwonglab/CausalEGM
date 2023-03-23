@@ -29,8 +29,8 @@ Latest news
 ^^^^^^^^^^^
 - Feb/2023: CausalEGM is now supporting stand-alone R package.
 - Feb/2023: Version 0.2.6 of CausalEGM is released on `Anaconda <https://anaconda.org/conda-forge/causalegm/>`_ .
-- Dec/2022: Preprint paper of CausalEGM is out on `arXiv <https://arxiv.org/abs/2212.05925/>`__.
-- Aug/2022: Version 0.1.0 of CausalEGM is released on `PyPI <https://pypi.org/project/epiaster/>`_. 
+- Dec/2022: Preprint paper of CausalEGM is out on `arXiv <https://arxiv.org/abs/2212.05925/>`_.
+- Aug/2022: Version 0.1.0 of CausalEGM is released on `PyPI <https://pypi.org/project/CausalEGM/>`_. 
 
 Main References
 ^^^^^^^^^^^^^^^
