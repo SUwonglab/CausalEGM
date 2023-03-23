@@ -8,7 +8,7 @@
 # <a href='https://causalegm.readthedocs.io/'><img src='https://raw.githubusercontent.com/SUwonglab/CausalEGM/main/docs/source/logo.png' align="left" height="60" /></a> A general causal inference framework by encoding generative modeling 
 
 
-<img align="left" src="https://github.com/SUwonglab/CausalEGM/blob/main/model.jpg" width="350">
+<a href='https://causalegm.readthedocs.io/'><img align="left" src="https://github.com/SUwonglab/CausalEGM/blob/main/model.jpg" width="350">
    
 CausalEGM is a general causal inference framework for estimating causal effects by encoding generative modeling, which can be applied in both discrete and continuous treatment settings. 
 
