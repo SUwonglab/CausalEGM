@@ -34,7 +34,7 @@ Checkout application examples in the [Python Tutorial](https://causalegm.readthe
 
 ## Latest News
 
-- Feb/2023: CausalEGM is now supporting stand-alone [R](https://cran.r-project.org/web/packages/RcausalEGM/index.html) package.
+- Mar/2023: CausalEGM is available in CRAN as a stand-alone [R package](https://cran.r-project.org/web/packages/RcausalEGM/index.html).
 
 - Feb/2023: Version 0.2.6 of CausalEGM is released on [Anaconda](https://anaconda.org/conda-forge/causalegm).
 
