@@ -11,6 +11,9 @@ install_causalegm(method = "auto", pip = TRUE)
 
 \item{pip}{boolean flag, default TRUE}
 }
+\value{
+No return value
+}
 \description{
 Install the python CausalEGM package
 }

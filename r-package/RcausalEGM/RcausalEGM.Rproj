@@ -20,3 +20,7 @@ PackageUseDevtools: Yes
 PackageInstallArgs: --no-multiarch --with-keep.source
 PackageCheckArgs: --as-cran
 PackageRoxygenize: rd,collate,namespace
+
+PythonType: conda
+PythonVersion: 3.10.9
+PythonPath: ~/miniconda3/bin/python3.10

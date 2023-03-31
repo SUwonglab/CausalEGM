@@ -2,6 +2,7 @@
 #'
 #' @param method default "auto"
 #' @param pip boolean flag, default TRUE
+#' @return No return value
 #' @importFrom reticulate py_install py_module_available
 #' @export install_causalegm
 install_causalegm <- function(method = "auto",pip = TRUE) {
@@ -42,7 +43,13 @@ install_causalegm <- function(method = "auto",pip = TRUE) {
 #' @param normalize whether apply normalization to covariates. Default: FALSE.
 #' @param x_min ADRF start value. Default: NULL
 #' @param x_max ADRF end value. Default: NULL
-#' @return  A trained causalEGM object.
+#' @returns \code{causalegm} returns an object of \code{\link[base:class]{class}} "causalegm".
+#'
+#' An object of class \code{"causalegm"} is a list containing the following:
+#'
+#'  \item{causal_pre}{the predicted causal effects, which are individual causal effects (ITEs) in binary treatment settings and dose-response values in continous treatment settings.}
+#'  \item{getCATE}{the method for getting the conditional average treatment effect (CATE).It takes covariates v as input.}
+#'  \item{predict}{the method for outcome function. It takes treatment x and covariates v as inputs.}
 #'
 #' @examples
 #' \donttest{
@@ -121,5 +128,11 @@ causalegm <- function(x, y, v,
               n_iter = as.integer(n_iter),
               batch_size = as.integer(bs),
               normalize = normalize)
-  model
+
+  output <- list(
+    "causal_pre" = model$best_causal_pre, "getCATE" = model$getCATE,
+    "predict" = model$predict)
+
+  class(output) <- "causalegm"
+  return(output)
 }

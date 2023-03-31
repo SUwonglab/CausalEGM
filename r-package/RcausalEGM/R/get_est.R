@@ -2,7 +2,7 @@
 #' @description When x is NULL, the conditional average treatment effect (CATE), namely tau(v), is estimated using a trained causalEGM model.
 #' When x is provided, estimating the potential outcome y given treatment x and covariates v using a trained causalEGM model.
 #'
-#' @param object The trained causalEGM object.
+#' @param object An object of class \code{"causalegm"}.
 #' @param v is the covariates, two-dimensional array with size n by p.
 #' @param x is the optional treatment variable, one-dimensional array with size n. Defaults to NULL.
 #' @return Vector of predictions.
@@ -19,8 +19,8 @@
 #' n_test <- 100
 #' v_test <- matrix(rnorm(n_test * p), n_test, p)
 #' x_test <- rbinom(n_test, 1, 0.4 + 0.2 * (v_test[, 1] > 0))
-#' pred_cate <- get_est(model, v_test) # CATE estimate
-#' pred_y <- get_est(model, v_test, x = x_test) # y given treatment x plus covariates v
+#' pred_cate <- get_est(model, v = v_test) # CATE estimate
+#' pred_y <- get_est(model, v = v_test, x = x_test) # y given treatment x plus covariates v
 #' }
 #' @export get_est
 get_est <- function(object, v, x = NULL) {

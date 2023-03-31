@@ -93,7 +93,13 @@ causalegm(
 \item{x_max}{ADRF end value. Default: NULL}
 }
 \value{
-A trained causalEGM object.
+\code{causalegm} returns an object of \code{\link[base:class]{class}} "causalegm".
+
+An object of class \code{"causalegm"} is a list containing the following:
+
+\item{causal_pre}{the predicted causal effects, which are individual causal effects (ITEs) in binary treatment settings and dose-response values in continous treatment settings.}
+\item{getCATE}{the method for getting the conditional average treatment effect (CATE).It takes covariates v as input.}
+\item{predict}{the method for outcome function. It takes treatment x and covariates v as inputs.}
 }
 \description{
 This function takes observation data (x,y,v) as input, and estimate the ATE/ITE/ADRF.
