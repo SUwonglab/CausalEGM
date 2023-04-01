@@ -1,4 +1,4 @@
-|PyPI| |Anaconda| |travis| |Platforms| |Docs|
+|PyPI| |CRAN| |Anaconda| |travis| |Platforms| |Docs|
 
 
 
@@ -27,8 +27,8 @@ CausalEGM's key applications
 
 Latest news
 ^^^^^^^^^^^
-- Feb/2023: CausalEGM is now supporting stand-alone R package.
-- Feb/2023: Version 0.2.6 of CausalEGM is released on `Anaconda <https://anaconda.org/conda-forge/causalegm/>`_ .
+- Mar/2023: CausalEGM is released in CRAN as a stand-alone `R package <https://cran.r-project.org/web/packages/RcausalEGM/index.html>`_.
+- Feb/2023: Version 0.2.6 of CausalEGM is released on `Anaconda <https://anaconda.org/conda-forge/causalegm/>`_.
 - Dec/2022: Preprint paper of CausalEGM is out on `arXiv <https://arxiv.org/abs/2212.05925/>`_.
 - Aug/2022: Version 0.1.0 of CausalEGM is released on `PyPI <https://pypi.org/project/CausalEGM/>`_. 
 
@@ -70,6 +70,9 @@ Your help to improve CausalEGM is highly appreciated!
 .. |PyPI| image:: https://img.shields.io/pypi/v/CausalEGM
    :target: https://pypi.org/project/CausalEGM/
 
+.. |CRAN| image:: https://www.r-pkg.org/badges/version/RcausalEGM
+   :target: https://cran.r-project.org/web/packages/RcausalEGM/index.html
+
 .. |Anaconda| image:: https://anaconda.org/conda-forge/causalegm/badges/version.svg
    :target: https://anaconda.org/conda-forge/causalegm
 
@@ -79,7 +82,7 @@ Your help to improve CausalEGM is highly appreciated!
 .. |Docs| image:: https://readthedocs.org/projects/causalegm/badge/?version=latest
    :target: https://causalegm.readthedocs.io
 
-.. |travis| image:: https://img.shields.io/travis/kimmo1019/CausalEGM
+.. |travis| image:: https://app.travis-ci.com/kimmo1019/CausalEGM.svg?branch=main
    :target: https://app.travis-ci.com/github/kimmo1019/CausalEG
 
 .. _Scanpy: https://scanpy.readthedocs.io
