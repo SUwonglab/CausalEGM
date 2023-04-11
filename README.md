@@ -41,7 +41,7 @@ Checkout application examples in the [Python Tutorial](https://causalegm.readthe
 
 - Dec/2022: Preprint paper of CausalEGM is out on [arXiv](https://arxiv.org/abs/2212.05925/).
 
-- Aug/2022: Version 0.1.0 of CausalEGM is released on [PyPI](https://pypi.org/project/epiaster/).
+- Aug/2022: Version 0.1.0 of CausalEGM is released on [PyPI](https://pypi.org/project/CausalEGM/).
 
 ## Main Reference
 
