@@ -1,9 +1,7 @@
 |PyPI| |CRAN| |Anaconda| |travis| |Platforms| |Docs|
 
-
-
-CausalEGM - A general causal inference framework by encoding generative modeling
-================================================================================
+CausalEGM - An Encoding Generative Modeling Approach to Dimension Reduction and Covariate Adjustment in Causal Inference
+========================================================================================================================
 
 .. image:: https://raw.githubusercontent.com/SUwonglab/CausalEGM/main/model.jpg
    :width: 300px
@@ -11,33 +9,37 @@ CausalEGM - A general causal inference framework by encoding generative modeling
 
 .. include:: _key_contributors.rst
 
-**CausalEGM** is a general causal inference framework `Liu et al. (arXiv, 2022) <https://arxiv.org/pdf/2212.05925.pdf>`_ for estimating causal effects by encoding generative modeling, which can be applied in both binary and continuous treatment settings.
+Causal inference has been increasingly essential in modern observational studies with rich covariate information. However, it is often challenging to estimate the causal effect with high-dimensional covariates.
 
-CausalEGM simultaneously decouples the dependencies of confounders on both treatment and outcome and maps the confounders to the low-dimensional latent space. 
-By conditioning on the low-dimensional latent features, CausalEGM can estimate the causal effect for each individual or the average causal effect within a population.
+We develop **CausalEGM**, a deep learning framework for nonlinear dimension reduction and generative modeling of the dependency among covariate features affecting treatment and response. 
+The key idea is to identify a latent covariate feature set (e.g., latent confounders) that affects both treatment and outcome. By conditioning on these features, 
+one can mitigate the confounding effect of the high dimensional covariate on the estimation of the causal relation between treatment and response.
 
-CausalEGM's key applications
+CausalEGM provides a flexible and powerful framework to develop deep learning-based estimates for treatment effect. Both empirical and theoretical results are provided to demonstrate the effectiveness of CausalEGM.
+
+CausalEGM Wide Applicability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- Estimate counterfactual outcome.
 - Estimate average treatment effect (ATE).
 - Estimate individual treatment effect (ITE).
 - Estiamte average dose response function (ADRF).
-- Estimate heterogenous treatment effect (HTE).
+- Estimate conditional average treatment effect (CATE).
 - Built-in simulation and semi-simulation datasets.
 
+CausalEGM Highlighted Features
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- Capable of handling both continuous and binary treatment settings.
+- Support big dataset with large sample size (e.g, >10M) and number of covariates (e.g., >10k) in a personal PC.
+- Provide both `Python PyPi package <https://pypi.org/project/CausalEGM/>`__ and `R CRAN package <https://cran.r-project.org/web/packages/RcausalEGM/index.html>`__, incluidng a user-friendly command-line interface (CLI).
 
-Latest news
-^^^^^^^^^^^
-- Mar/2023: CausalEGM is released in CRAN as a stand-alone `R package <https://cran.r-project.org/web/packages/RcausalEGM/index.html>`_.
-- Feb/2023: Version 0.2.6 of CausalEGM is released on `Anaconda <https://anaconda.org/conda-forge/causalegm/>`_.
-- Dec/2022: Preprint paper of CausalEGM is out on `arXiv <https://arxiv.org/abs/2212.05925/>`_.
-- Aug/2022: Version 0.1.0 of CausalEGM is released on `PyPI <https://pypi.org/project/CausalEGM/>`_. 
 
 Main References
 ^^^^^^^^^^^^^^^
-Liu *et al.* (2021), Density estimation using deep generative neural networks, `PNAS <https://www.pnas.org/doi/abs/10.1073/pnas.2101344118>`_.
-
 Liu *et al.* (2022), CausalEGM: a general causal inference framework by encoding generative modeling,
 `arXiv <https://arxiv.org/abs/2212.05925>`__.
+
+Liu *et al.* (2021), Density estimation using deep generative neural networks, `PNAS <https://www.pnas.org/doi/abs/10.1073/pnas.2101344118>`_.
+
 
 Support
 ^^^^^^^
