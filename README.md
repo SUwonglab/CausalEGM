@@ -6,7 +6,7 @@
 [![Documentation Status](https://readthedocs.org/projects/causalegm/badge/?version=latest)](https://causalegm.readthedocs.io)
 
 
-# <a href='https://causalegm.readthedocs.io/'><img src='https://raw.githubusercontent.com/SUwonglab/CausalEGM/main/docs/source/logo.png' align="left" height="60" /></a> CausalEGM: An encoding generative modeling approach to dimension reduction and covariate adjustment in causal inference
+# <a href='https://causalegm.readthedocs.io/'><img src='https://raw.githubusercontent.com/SUwonglab/CausalEGM/main/docs/source/logo.png' align="left" height="60" /></a> CausalEGM: An Encoding Generative Modeling Approach in Causal Inference
 
 
 <a href='https://causalegm.readthedocs.io/'><img align="left" src="https://github.com/SUwonglab/CausalEGM/blob/main/model.jpg" width="350">
