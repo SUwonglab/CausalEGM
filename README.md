@@ -1,6 +1,7 @@
 [![PyPI](https://img.shields.io/pypi/v/CausalEGM)](https://pypi.org/project/CausalEGM/)
+[![CRAN](https://www.r-pkg.org/badges/version/RcausalEGM)](https://cran.r-project.org/web/packages/RcausalEGM/index.html)
 [![Anaconda](https://anaconda.org/conda-forge/causalegm/badges/version.svg)](https://anaconda.org/conda-forge/causalegm)
-[![Travis (.org)](https://img.shields.io/travis/kimmo1019/CausalEGM)](https://app.travis-ci.com/github/kimmo1019/CausalEGM)
+[![Travis (.org)](https://app.travis-ci.com/kimmo1019/CausalEGM.svg?branch=main)](https://app.travis-ci.com/github/kimmo1019/CausalEGM)
 [![All Platforms](https://dev.azure.com/conda-forge/feedstock-builds/_apis/build/status/causalegm-feedstock?branchName=main)](https://dev.azure.com/conda-forge/feedstock-builds/_build/latest?definitionId=18625&branchName=main)
 [![Documentation Status](https://readthedocs.org/projects/causalegm/badge/?version=latest)](https://causalegm.readthedocs.io)
 
@@ -14,7 +15,7 @@ CausalEGM is a general causal inference framework for estimating causal effects 
 
 CausalEGM simultaneously decouples the dependencies of confounders on both treatment and outcome and maps the confounders to the low-dimensional latent space. By conditioning on the low-dimensional latent features, CausalEGM can estimate the causal effect for each individual or the average causal effect within a population.
 
-CausalEGM was developed with Python and TensorFlow, we provide a console program to run CausalEGM directly without running any Python script. For more information, checkout the [Document](https://causalegm.readthedocs.io/).
+CausalEGM was originally developed with Python and TensorFlow. Now both [Python](https://pypi.org/project/CausalEGM/) and [R](https://cran.r-project.org/web/packages/RcausalEGM/index.html) package for CausalEGM are available! Besides, we provide a console program to run CausalEGM directly without running any script. For more information, checkout the [Document](https://causalegm.readthedocs.io/).
 
 Note that a GPU is recommended for accelerating the model training. However, GPU is not a must, CausalEGM can be installed on any personal computer (e.g, Macbook) or computational cluster with CPU only.
 
@@ -34,13 +35,13 @@ Checkout application examples in the [Python Tutorial](https://causalegm.readthe
 
 ## Latest News
 
-- Feb/2023: CausalEGM is now supporting stand-alone R package.
+- Mar/2023: CausalEGM is available in CRAN as a stand-alone [R package](https://cran.r-project.org/web/packages/RcausalEGM/index.html).
 
 - Feb/2023: Version 0.2.6 of CausalEGM is released on [Anaconda](https://anaconda.org/conda-forge/causalegm).
 
 - Dec/2022: Preprint paper of CausalEGM is out on [arXiv](https://arxiv.org/abs/2212.05925/).
 
-- Aug/2022: Version 0.1.0 of CausalEGM is released on [PyPI](https://pypi.org/project/epiaster/).
+- Aug/2022: Version 0.1.0 of CausalEGM is released on [PyPI](https://pypi.org/project/CausalEGM/).
 
 ## Main Reference
 
