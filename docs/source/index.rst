@@ -9,7 +9,7 @@ CausalEGM - An Encoding Generative Modeling Approach to Dimension Reduction and 
 
 .. include:: _key_contributors.rst
 
-Causal inference has become an extremely essential topic in modern observational studies with rich covariate information. However, it is often challenging to estimate the causal effect with high-dimensional covariates
+Causal inference has become extremely essential within modern observational studies with rich covariate information. However, it is often challenging to estimate the causal effect with high-dimensional covariates
 due to the “curse of dimensionality”.
 
 We develop **CausalEGM**, a deep learning framework for nonlinear dimension reduction and generative modeling of the dependency among covariate features affecting treatment and response. 
