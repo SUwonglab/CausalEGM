@@ -43,6 +43,15 @@ Checkout application examples in the [Python Tutorial](https://causalegm.readthe
 
 - Aug/2022: Version 0.1.0 of CausalEGM is released on [PyPI](https://pypi.org/project/CausalEGM/).
 
+## Datasets
+
+Create a `CausalEGM/data` folder and uncompress the dataset in the `CausalEGM/data` folder.
+
+- [Twin dataset](https://www.nber.org/research/data/linked-birthinfant-death-cohort-data). Google Drive download [link](https://drive.google.com/file/d/1fKCb-SHNKLsx17fezaHrR2j29T3uD0C2/view?usp=sharing).
+
+- [ACIC 2018 datasets](https://www.synapse.org/#!Synapse:syn11294478/wiki/494269). Google Drive download [link](https://drive.google.com/file/d/1qsYTP8NGh82nFNr736xrMsJxP73gN9OG/view?usp=sharing).
+  
+
 ## Main Reference
 
 If you find CausalEGM useful for your work, please consider citing our [paper](https://arxiv.org/abs/2212.05925):
