@@ -66,7 +66,7 @@ install_causalegm <- function(method = "auto",pip = TRUE) {
 #' @importFrom reticulate py_module_available
 #' @export causalegm
 causalegm <- function(x, y, v,
-                        z_dims = c(3,3,6,6),
+                        z_dims = c(3,6,3,6),
                         output_dir = ".",
                         dataset = "myData",
                         lr = 0.0002,

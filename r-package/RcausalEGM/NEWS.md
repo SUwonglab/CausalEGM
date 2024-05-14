@@ -1,9 +1,12 @@
 # RcausalEGM
 
+# RcausalEGM 0.4.0
+
+* Fixed z1&z2 exchange bug.
+
 # RcausalEGM 0.3.1
 
 * `causalegm(x_min = NULL, x_max = NULL)` is the new default for controlling range for treatment.
-
 
 # RcausalEGM 0.3.0
 

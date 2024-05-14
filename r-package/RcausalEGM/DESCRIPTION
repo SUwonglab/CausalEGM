@@ -1,8 +1,8 @@
 Package: RcausalEGM
 Type: Package
 Title: A General Causal Inference Framework by Encoding Generative Modeling
-Version: 0.3.3
-Date: 2023-03-22
+Version: 0.4.0
+Date: 2024-05-14
 Authors@R: c(
     person("Qiao", "Liu", role = c("aut", "cre"), email = "liuqiao@stanford.edu"),
     person("Wing", "Wong", role = "aut"),
