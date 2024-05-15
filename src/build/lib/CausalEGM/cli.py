@@ -20,7 +20,7 @@ def main(args=None):
                         help="whether use binary treatment setting.")
 
     #model hypterparameters
-    parser.add_argument('-z_dims', dest='z_dims', type=int, nargs='+', default=[3,3,6,6],
+    parser.add_argument('-z_dims', dest='z_dims', type=int, nargs='+', default=[3,6,3,6],
                         help='Latent dimensions of the four encoder outputs e(V)_0~3.')
     parser.add_argument('-lr', dest='lr', type=float, default=0.0002,
                         help="Learning rate for the optimizer (default: 0.0002).")
@@ -75,4 +75,4 @@ def main(args=None):
                 startoff=args.startoff, save_format=args.save_format)
 
 if __name__ == "__main__":
-   main()
+    main()
