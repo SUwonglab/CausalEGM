@@ -8,7 +8,7 @@ causalegm(
   x,
   y,
   v,
-  z_dims = c(3, 3, 6, 6),
+  z_dims = c(3, 6, 3, 6),
   output_dir = ".",
   dataset = "myData",
   lr = 2e-04,
@@ -113,7 +113,6 @@ v <- matrix(rnorm(n * p), n, p)
 x <- rbinom(n, 1, 0.4 + 0.2 * (v[, 1] > 0))
 y <- pmax(v[, 1], 0) * x + v[, 2] + pmin(v[, 3], 0) + rnorm(n)
 model <- causalegm(x=x, y=y, v=v, n_iter=3000)
-paste("The average treatment effect (ATE):", round(model$ATE, 2))
 }
 
 }
