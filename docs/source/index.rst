@@ -43,8 +43,8 @@ CausalEGM Highlighted Features
 
 Main References
 ^^^^^^^^^^^^^^^
-Liu *et al.* (2022), CausalEGM: a general causal inference framework by encoding generative modeling,
-`arXiv <https://arxiv.org/abs/2212.05925>`__.
+Liu *et al.* (2024), CausalEGM: an encoding generative modeling approach to dimension reduction and covariate adjustment in causal inference with observational studies,
+`PNAS <https://www.pnas.org/doi/abs/10.1073/pnas.2322376121>`__.
 
 Liu *et al.* (2021), Density estimation using deep generative neural networks, `PNAS <https://www.pnas.org/doi/abs/10.1073/pnas.2101344118>`_.
 

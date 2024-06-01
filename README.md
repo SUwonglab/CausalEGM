@@ -35,6 +35,8 @@ Checkout application examples in the [Python Tutorial](https://causalegm.readthe
 
 ## Latest News
 
+- May/2024: CausalEGM is published online on [PNAS](https://www.pnas.org/doi/abs/10.1073/pnas.2322376121).
+
 - Mar/2023: CausalEGM is available in CRAN as a stand-alone [R package](https://cran.r-project.org/web/packages/RcausalEGM/index.html).
 
 - Feb/2023: Version 0.2.6 of CausalEGM is released on [Anaconda](https://anaconda.org/conda-forge/causalegm).
@@ -54,9 +56,9 @@ Create a `CausalEGM/data` folder and uncompress the dataset in the `CausalEGM/da
 
 ## Main Reference
 
-If you find CausalEGM useful for your work, please consider citing our [paper](https://arxiv.org/abs/2212.05925):
+If you find CausalEGM useful for your work, please consider citing our [PNAS paper](https://www.pnas.org/doi/abs/10.1073/pnas.2322376121):
 
-Qiao Liu, Zhongren Chen, Wing Hung Wong. CausalEGM: a general causal inference framework by encoding generative modeling[J]. arXiv preprint arXiv:2212.05925, 2022.
+Qiao Liu, Zhongren Chen, Wing Hung Wong. An encoding generative modeling approach to dimension reduction and covariate adjustment in causal inference with observational studies [J]. PNAS, 2024.
 
 ## Support
 
